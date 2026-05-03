@@ -11,6 +11,7 @@ local live_multigrep = function(opts)
   opts.cwd = opts.cwd or vim.uv.cwd()
 
   local finder = finders.new_async_job {
+    -- Prompt format: `search_term  glob_pattern` (double-space delimiter).
     command_generator = function(prompt)
       if not prompt or prompt == "" then
         return nil
@@ -48,6 +49,7 @@ local live_multigrep = function(opts)
 end
 
 M.setup = function()
+  -- Register multigrep picker keymap from a single setup call.
   vim.keymap.set("n", "<leader>fg", live_multigrep, { desc = "Telescope Multi Grep (dropdown)" })
 end
 

@@ -21,6 +21,7 @@ return {
 
     require("config.telescope.multigrep").setup()
     local builtin = require("telescope.builtin")
+    -- Narrow the symbol picker to callable members for quick code navigation.
     local function list_document_functions()
       builtin.lsp_document_symbols({
         symbols = { "Function", "Method", "function", "method" },

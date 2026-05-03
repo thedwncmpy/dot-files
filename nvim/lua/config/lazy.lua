@@ -42,10 +42,10 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 -- 1. Enable wrapping
 vim.opt.wrap = true
--- 2. THIS IS THE BIG ONE: It keeps the wrapped lines 
+-- 2. THIS IS THE BIG ONE: It keeps the wrapped lines
 -- aligned with the indentation of the starting line.
 vim.opt.breakindent = true
--- 3. Prevents words from being split in the middle. 
+-- 3. Prevents words from being split in the middle.
 -- It will wait for a space/punctuation to wrap.
 vim.opt.linebreak = true
 vim.opt.autoread = true

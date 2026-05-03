@@ -1,9 +1,8 @@
 return {
-{
-    'windwp/nvim-autopairs',
+  {
+    "windwp/nvim-autopairs",
     event = "InsertEnter",
-    config = true
-    -- use opts = {} for passing setup options
-    -- this is equivalent to setup({}) function
-}
+    -- Use plugin defaults by delegating to require("nvim-autopairs").setup({}).
+    config = true,
+  },
 }

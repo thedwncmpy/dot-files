@@ -1,4 +1,6 @@
-return { {
-  "stevearc/dressing.nvim",
-  opts = {},
-} }
+return {
+  {
+    "stevearc/dressing.nvim",
+    opts = {},
+  },
+}

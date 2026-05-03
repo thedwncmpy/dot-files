@@ -97,23 +97,23 @@ mkcd() {
 
 # Smart PNPM Dev: Runs dev and auto-opens localhost in browser
 pdev() {
-    local opened=false
-    pnpm run dev 2>&1 | while IFS= read -r line; do
-        echo "$line"
-        if [[ "$opened" == false && "$line" == *"Local:"* && "$line" == *"localhost"* ]]; then
-            local url=$(echo "$line" | grep -o 'http://localhost:[0-9]*')
-            if [[ -n "$url" ]]; then
-                echo "Opening $url"
-                open "$url"
-                opened=true
-            fi
-        fi
-    done
+  local opened=false
+  pnpm run dev 2>&1 | while IFS= read -r line; do
+    echo "$line"
+    if [[ "$opened" == false && "$line" == *"Local:"* && "$line" == *"localhost"* ]]; then
+      local url=$(echo "$line" | grep -o 'http://localhost:[0-9]*')
+      if [[ -n "$url" ]]; then
+        echo "Opening $url"
+        open "$url"
+        opened=true
+      fi
+    fi
+  done
 }
 
 # Lookup documentation
 cheat() {
-    curl -s "cheat.sh/$1"
+  curl -s "cheat.sh/$1"
 }
 
 _cheat_completions() {
@@ -125,7 +125,7 @@ _cheat_completions() {
 
 compdef _cheat_completions cheat
 
-# Auto-activate/deactivate .venv based on directory
+# Auto-activate/deactivate project virtualenvs when moving across directories.
 function _auto_activate_venv() {
   # 1. ACTIVATE: If we enter a dir with .venv and it's not already active
   if [[ -d .venv || -d venv ]]; then
@@ -158,6 +158,7 @@ setopt incappendhistory
 
 # FZF History Search (Ctrl+R)
 fh() {
+  # Use fzf to pick from shell history and inject into the command line buffer.
   BUFFER=$(history -n 1 | fzf --height=6 --layout=reverse --info=inline --tac)
   CURSOR=$#BUFFER
   zle redisplay

@@ -4,8 +4,8 @@
 
 -- SOURCE / EXECUTE
 vim.keymap.set("n", "<space><space>x", "<cmd>source %<CR>", { desc = "Source current file" })
-vim.keymap.set("n", "<space>x", ":.lua<CR>",                { desc = "Execute current line" })
-vim.keymap.set("v", "<space>x", ":lua<CR>",                { desc = "Execute selection" })
+vim.keymap.set("n", "<space>x", ":.lua<CR>", { desc = "Execute current line" })
+vim.keymap.set("v", "<space>x", ":lua<CR>", { desc = "Execute selection" })
 
 -- NAVIGATION (Word-wise h/l)
 -- Note: h is now Back (b) and l is now Forward (w)
@@ -30,25 +30,26 @@ vim.keymap.set("v", "<C-j>", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move b
 vim.keymap.set("v", "<C-k>", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move block up" })
 
 -- QUICKFIX & DIAGNOSTICS
-vim.keymap.set("n", "<M-]>",     "<cmd>cnext<CR>", { desc = "Next quickfix item" })
-vim.keymap.set("n", "<M-[>",     "<cmd>cprev<CR>", { desc = "Prev quickfix item" })
-vim.keymap.set("n", "<M-o>",     "<cmd>copen<CR>", { desc = "Open quickfix window" })
+vim.keymap.set("n", "<M-]>", "<cmd>cnext<CR>", { desc = "Next quickfix item" })
+vim.keymap.set("n", "<M-[>", "<cmd>cprev<CR>", { desc = "Prev quickfix item" })
+vim.keymap.set("n", "<M-o>", "<cmd>copen<CR>", { desc = "Open quickfix window" })
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open diagnostic float" })
+-- Populate quickfix with diagnostics from all listed buffers.
 vim.keymap.set("n", "<leader>d", function()
-    vim.diagnostic.setqflist()
+  vim.diagnostic.setqflist()
 end, { desc = "Set quickfix list with diagnostics" })
 
 -- OIL.NVIM
 vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 -- Definition Lookup
-vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = 'LSP Definition' })
+vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "LSP Definition" })
 -- ========================================================================== --
 --                                 AUTOCMDS                                   --
 -- ========================================================================== --
 
 -- HELP WINDOW (Always open on the far right)
 vim.api.nvim_create_autocmd("FileType", {
-  group   = vim.api.nvim_create_augroup("HelpVerticalSplit", { clear = true }),
+  group = vim.api.nvim_create_augroup("HelpVerticalSplit", { clear = true }),
   pattern = "help",
   callback = function()
     vim.cmd "wincmd L"
