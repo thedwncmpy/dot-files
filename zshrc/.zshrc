@@ -15,6 +15,10 @@ export PYENV_ROOT="$HOME/.pyenv"
 # Path setup (Brew first, then others)
 export PATH="$HOME/.pnpm-global/bin:$PYENV_ROOT/bin:$PATH"
 export FZF_DEFAULT_OPTS="--cycle"
+# Load Notion Integration
+if [[ -f "$HOME/.config/zshrc/notion/notion.zsh" ]]; then
+  source "$HOME/.config/zshrc/notion/notion.zsh"
+fi
 
 # ==========================================
 # 3. OH-MY-ZSH CONFIGURATION
@@ -94,6 +98,7 @@ alias ask="gemini -p"
 mkcd() {
   mkdir -p -- "$1" && cd -- "$1"
 }
+
 
 # Smart PNPM Dev: Runs dev and auto-opens localhost in browser
 pdev() {
