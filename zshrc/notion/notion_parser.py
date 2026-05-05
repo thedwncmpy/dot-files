@@ -6,15 +6,7 @@ def parse_inline_text(text):
     """
     Parses bold and italics in a string and returns Notion rich_text objects.
     """
-    # Regex for bold (**text** or __text__) and italics (*text* or _text_)
-    # This is a simplified parser; it handles basic nesting but not perfectly.
-    
     parts = []
-    # Pattern to match bold, italics, or plain text
-    # Order matters: Bold first, then Italics
-    pattern = r'(\*\*\*.*?\*\*\*|\*\*.*?\*\*|__.*?__|(\*|_).*?(\*|_)|.+?)'
-    
-    # We use a more iterative approach for simple inline parsing
     remaining = text
     while remaining:
         # Bold + Italic (***text***)
@@ -47,17 +39,35 @@ def parse_inline_text(text):
             remaining = italic_match.group(3)
             continue
             
-        # Plain text (up to the next potential symbol)
+        # Plain text
         plain_match = re.match(r'^([^*_]+)(.*)', remaining)
         if plain_match:
             parts.append({"text": {"content": plain_match.group(1)}})
             remaining = plain_match.group(2)
         else:
-            # Fallback for single characters that aren't matches
             parts.append({"text": {"content": remaining[0]}})
             remaining = remaining[1:]
 
     return parts
+
+def rich_text_to_md(rich_text_list):
+    """
+    Converts Notion rich_text objects back to Markdown string.
+    """
+    md = ""
+    for rt in rich_text_list:
+        text = rt.get("plain_text", "")
+        ann = rt.get("annotations", {})
+        
+        if ann.get("bold") and ann.get("italic"):
+            text = f"***{text}***"
+        elif ann.get("bold"):
+            text = f"**{text}**"
+        elif ann.get("italic"):
+            text = f"*{text}*"
+        
+        md += text
+    return md
 
 def md_to_notion_blocks(md_text):
     blocks = []
@@ -68,6 +78,15 @@ def md_to_notion_blocks(md_text):
         if not line:
             continue
             
+        # Table of Contents placeholder
+        if line == "[TOC]":
+            blocks.append({
+                "object": "block",
+                "type": "table_of_contents",
+                "table_of_contents": {}
+            })
+            continue
+
         # Headers
         if line.startswith("# "):
             blocks.append({
@@ -110,11 +129,10 @@ def md_to_notion_blocks(md_text):
                 "bulleted_list_item": {"rich_text": parse_inline_text(line[2:])}
             })
             
-        # Callouts (using > syntax)
+        # Callouts
         elif line.startswith("> "):
             content = line[2:]
-            icon = "💡" # Default icon
-            # Check for [!INFO], [!WARNING], etc.
+            icon = "💡"
             alert_match = re.match(r'^\[!(.*?)\]\s*(.*)', content)
             if alert_match:
                 alert_type = alert_match.group(1).upper()
@@ -133,7 +151,7 @@ def md_to_notion_blocks(md_text):
                 }
             })
             
-        # Paragraph (Default)
+        # Paragraph
         else:
             blocks.append({
                 "object": "block",
@@ -141,17 +159,81 @@ def md_to_notion_blocks(md_text):
                 "paragraph": {"rich_text": parse_inline_text(line)}
             })
             
-    return blocks[:100] # Notion API limit per request
+    return blocks[:100]
+
+def notion_blocks_to_md(blocks):
+    """
+    Converts Notion block objects back to Markdown string with improved spacing.
+    """
+    md_lines = []
+    prev_type = None
+    
+    for block in blocks:
+        b_type = block.get("type")
+        if not b_type: continue
+        
+        # Add a blank line between different block types, 
+        # but keep list items of the same type together.
+        if prev_type is not None:
+            is_list = b_type in ["bulleted_list_item", "to_do"]
+            is_same_list = is_list and b_type == prev_type
+            if not is_same_list:
+                md_lines.append("")
+
+        if b_type == "table_of_contents":
+            md_lines.append("[TOC]")
+        else:
+            content = block.get(b_type, {})
+            rich_text = content.get("rich_text", [])
+            text = rich_text_to_md(rich_text)
+            
+            if b_type == "heading_1":
+                md_lines.append(f"# {text}")
+            elif b_type == "heading_2":
+                md_lines.append(f"## {text}")
+            elif b_type == "heading_3":
+                md_lines.append(f"### {text}")
+            elif b_type == "bulleted_list_item":
+                md_lines.append(f"- {text}")
+            elif b_type == "to_do":
+                checked = content.get("checked", False)
+                mark = "x" if checked else " "
+                md_lines.append(f"- [{mark}] {text}")
+            elif b_type == "callout":
+                icon = content.get("icon", {}).get("emoji", "💡")
+                prefix = "> "
+                if icon == "⚠️": prefix += "[!WARNING] "
+                elif icon == "🚨": prefix += "[!ERROR] "
+                elif icon == "ℹ️": prefix += "[!INFO] "
+                elif icon == "✅": prefix += "[!SUCCESS] "
+                md_lines.append(f"{prefix}{text}")
+            elif b_type == "paragraph":
+                md_lines.append(text)
+        
+        prev_type = b_type
+        
+    return "\n".join(md_lines)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.exit(1)
         
-    file_path = sys.argv[1]
-    try:
-        with open(file_path, 'r') as f:
-            content = f.read()
-        print(json.dumps(md_to_notion_blocks(content)))
-    except Exception as e:
-        sys.stderr.write(f"Error: {str(e)}\n")
-        sys.exit(1)
+    if sys.argv[1] == "--reverse":
+        try:
+            data = sys.stdin.read()
+            if not data:
+                sys.exit(0)
+            blocks = json.loads(data)
+            print(notion_blocks_to_md(blocks))
+        except Exception as e:
+            sys.stderr.write(f"Error in reverse parsing: {str(e)}\n")
+            sys.exit(1)
+    else:
+        file_path = sys.argv[1]
+        try:
+            with open(file_path, 'r') as f:
+                content = f.read()
+            print(json.dumps(md_to_notion_blocks(content)))
+        except Exception as e:
+            sys.stderr.write(f"Error: {str(e)}\n")
+            sys.exit(1)
