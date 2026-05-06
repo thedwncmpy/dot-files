@@ -98,6 +98,7 @@ alias tns='tmux new -s'
 alias ta='tmux attach -t'
 alias td='tmux detach'
 alias tls='tmux ls'
+alias tsc='tmux switch-client -t'
 
 #AI
 alias ask="gemini -p"

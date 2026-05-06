@@ -7,16 +7,14 @@ return {
     config = function()
       require('github-theme').setup({
         options = {
+          transparent = true,
+          styles = {
+            sidebars = "transparent",
+            floats = "transparent",
+          },
           darken = {
             sidebars = { "qf", "vista_kind", "terminal", "packer" },
             floats = true,
-          },
-        },
-        -- This ensures the background is #000000 across the UI
-        specs = {
-          all = {
-            bg1 = '#000000',
-            bg0 = '#000000',
           },
         },
       })

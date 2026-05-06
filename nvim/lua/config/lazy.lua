@@ -40,6 +40,7 @@ vim.opt.softtabstop = 2   -- Number of spaces tabs count for while editing
 vim.opt.clipboard = "unnamedplus"
 vim.opt.number = true
 vim.opt.relativenumber = true
+vim.opt.signcolumn = "yes"
 -- 1. Enable wrapping
 vim.opt.wrap = true
 -- 2. THIS IS THE BIG ONE: It keeps the wrapped lines

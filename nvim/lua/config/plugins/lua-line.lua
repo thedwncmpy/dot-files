@@ -3,10 +3,19 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
+      local iceberg_transparent = require("lualine.themes.iceberg_dark")
+      for _, mode in pairs(iceberg_transparent) do
+        for _, section in pairs(mode) do
+          section.bg = nil
+        end
+        if mode.a then mode.a.fg = "#ffffff" end
+        if mode.z then mode.z.fg = "#ffffff" end
+      end
+
       require("lualine").setup {
         options = {
           icons_enabled = true,
-          theme = "iceberg_dark",
+          theme = iceberg_transparent,
           component_separators = { left = "", right = "" },
           section_separators = { left = "", right = "" },
           disabled_filetypes = {
@@ -57,6 +66,9 @@ return {
         inactive_winbar = {},
         extensions = {},
       }
+
+      vim.api.nvim_set_hl(0, "StatusLine", { bg = "none" })
+      vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "none" })
     end,
   },
 }
