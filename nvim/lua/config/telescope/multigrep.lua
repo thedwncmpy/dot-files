@@ -2,12 +2,11 @@ local pickers = require "telescope.pickers"
 local finders = require "telescope.finders"
 local make_entry = require "telescope.make_entry"
 local conf = require "telescope.config".values
-local themes = require "telescope.themes" -- 👈 add this
 
 local M = {}
 
 local live_multigrep = function(opts)
-  opts = themes.get_dropdown(opts or {})
+  opts = opts or {}
   opts.cwd = opts.cwd or vim.uv.cwd()
 
   local finder = finders.new_async_job {
@@ -50,7 +49,7 @@ end
 
 M.setup = function()
   -- Register multigrep picker keymap from a single setup call.
-  vim.keymap.set("n", "<leader>fg", live_multigrep, { desc = "Telescope Multi Grep (dropdown)" })
+  vim.keymap.set("n", "<leader>fg", live_multigrep, { desc = "Telescope Multi Grep" })
 end
 
 return M
