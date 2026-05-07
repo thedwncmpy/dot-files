@@ -4,6 +4,28 @@ return {
   -- branch = "0.1.x",
   dependencies = { "nvim-lua/plenary.nvim", { "nvim-telescope/telescope-fzf-native.nvim", build = "make" } },
   config = function()
+    if not vim.g._lsp_make_position_params_patched then
+      local original_make_position_params = vim.lsp.util.make_position_params
+      vim.lsp.util.make_position_params = function(window, position_encoding)
+        if position_encoding == nil then
+          local ok, bufnr = pcall(function()
+            if window then
+              return vim.api.nvim_win_get_buf(window)
+            end
+            return vim.api.nvim_get_current_buf()
+          end)
+          if ok then
+            local clients = vim.lsp.get_clients { bufnr = bufnr }
+            if clients[1] then
+              position_encoding = clients[1].offset_encoding or clients[1].position_encoding
+            end
+          end
+        end
+        return original_make_position_params(window, position_encoding)
+      end
+      vim.g._lsp_make_position_params_patched = true
+    end
+
     local tele = require "telescope"
     tele.setup {
       defaults = {
@@ -32,9 +54,19 @@ return {
 
     require("config.telescope.multigrep").setup()
     local builtin = require "telescope.builtin"
+    local function lsp_position_encoding(bufnr)
+      local clients = vim.lsp.get_clients { bufnr = bufnr }
+      if clients[1] then
+        return clients[1].offset_encoding or clients[1].position_encoding
+      end
+      return "utf-16"
+    end
     -- Narrow the symbol picker to callable members for quick code navigation.
     local function list_document_functions()
+      local bufnr = vim.api.nvim_get_current_buf()
       builtin.lsp_document_symbols {
+        bufnr = bufnr,
+        position_encoding = lsp_position_encoding(bufnr),
         symbols = { "Function", "Method", "function", "method" },
       }
     end
