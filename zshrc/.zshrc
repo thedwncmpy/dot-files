@@ -25,6 +25,9 @@ path=(
 
 export EDITOR=$(command -v nvim || echo "vi")
 export VISUAL=$(command -v nvim || echo "vi")
+export PAGER="bat"
+export BAT_PAGER="less -RF"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export FZF_DEFAULT_OPTS="--cycle"
 # Load Notion Integration
 if [[ -f "$HOME/.config/zshrc/notion/notion.zsh" ]]; then
@@ -69,6 +72,7 @@ alias cdi='zi'
 # Terminal/Editor (Using Bat & FZF)
 alias nv='nvim'
 alias cat="bat --color=always"
+alias less='bat'
 alias view='fzf'
 alias ivs='nvim $(fzf -m --preview="bat --color=always {}")'
 
