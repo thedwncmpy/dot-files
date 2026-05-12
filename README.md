@@ -1,15 +1,12 @@
 # Dotfiles Overview
 
-This repository contains terminal-first development configuration for Ghostty,
-tmux, zsh, and Neovim.
+This repository contains terminal-first development configuration for Ghostty, tmux, zsh, and Neovim.
 
 ## Ghostty
 
 Configured in `ghostty/config`.
 
-Ghostty is the terminal emulator. The config uses `Lilex Nerd Font`, 20pt text,
-a pure black background, balanced padding, a transparent macOS titlebar, saved
-window state, and Display P3 color.
+Ghostty is the terminal emulator. The config uses `Lilex Nerd Font`, 20pt text, a pure black background, balanced padding, a transparent macOS titlebar, saved window state, and Display P3 color.
 
 ## tmux
 

@@ -38,6 +38,20 @@ vim.opt.shiftwidth = 2    -- Size of an indent
 vim.opt.tabstop = 2       -- Number of spaces tabs count for
 vim.opt.softtabstop = 2   -- Number of spaces tabs count for while editing
 vim.opt.clipboard = "unnamedplus"
+
+if vim.env.SSH_CONNECTION then
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    },
+  }
+end
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.signcolumn = "yes"
