@@ -26,8 +26,16 @@ vim.keymap.set("n", "<M-C-l>", ":bnext<CR>", { noremap = true, silent = true, de
 vim.keymap.set("n", "<leader>q", ":qa<CR>", { desc = "Quit all" })
 
 -- MOVING TEXT (Visual Mode)
-vim.keymap.set("v", "<C-j>", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move block down" })
-vim.keymap.set("v", "<C-k>", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move block up" })
+vim.keymap.set("x", "<C-j>", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move block down" })
+vim.keymap.set("x", "<C-k>", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move block up" })
+
+-- SNIPPET JUMPING (Select Mode)
+vim.keymap.set("s", "<C-j>", function()
+  require("luasnip").jump(1)
+end, { silent = true, desc = "Jump forward (Luasnip)" })
+vim.keymap.set("s", "<C-k>", function()
+  require("luasnip").jump(-1)
+end, { silent = true, desc = "Jump backward (Luasnip)" })
 
 -- QUICKFIX & DIAGNOSTICS
 vim.keymap.set("n", "<M-]>", "<cmd>cnext<CR>", { desc = "Next quickfix item" })
