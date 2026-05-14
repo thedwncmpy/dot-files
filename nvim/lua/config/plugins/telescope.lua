@@ -27,8 +27,19 @@ return {
     end
 
     local tele = require "telescope"
+    local actions = require "telescope.actions"
     tele.setup {
       defaults = {
+        mappings = {
+          i = {
+            ["<C-j>"] = actions.move_selection_next,
+            ["<C-k>"] = actions.move_selection_previous,
+          },
+          n = {
+            ["<C-j>"] = actions.move_selection_next,
+            ["<C-k>"] = actions.move_selection_previous,
+          },
+        },
         layout_strategy = "vertical",
         layout_config = {
           vertical = {
