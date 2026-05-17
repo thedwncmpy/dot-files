@@ -77,7 +77,7 @@ alias view='fzf'
 alias ivs='nvim $(fzf -m --preview="bat --color=always {}")'
 
 # LSD (Modern ls)
-alias ls='lsd -F --group-dirs=first'
+alias ls='lsd -1F --group-dirs=first'
 alias la='lsd -AF --group-dirs=first'
 alias ll='lsd -lAF --group-dirs=first'
 alias lg='lsd -F --group-dirs=first'
