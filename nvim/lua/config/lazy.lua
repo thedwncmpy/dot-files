@@ -64,3 +64,8 @@ vim.opt.breakindent = true
 -- It will wait for a space/punctuation to wrap.
 vim.opt.linebreak = true
 vim.opt.autoread = true
+
+-- FOLDING
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldlevel = 99
