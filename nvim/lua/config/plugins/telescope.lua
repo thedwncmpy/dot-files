@@ -75,6 +75,10 @@ return {
     -- Narrow the symbol picker to callable members for quick code navigation.
     local function list_document_functions()
       local bufnr = vim.api.nvim_get_current_buf()
+      if vim.tbl_isempty(vim.lsp.get_clients { bufnr = bufnr }) then
+        vim.notify("No active LSP client for current buffer", vim.log.levels.WARN)
+        return
+      end
       builtin.lsp_document_symbols {
         bufnr = bufnr,
         position_encoding = lsp_position_encoding(bufnr),

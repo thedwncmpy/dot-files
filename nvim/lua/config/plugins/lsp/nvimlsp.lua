@@ -14,5 +14,22 @@ return {
     vim.lsp.config("*", {
       capabilities = capabilities,
     })
+
+    vim.lsp.config("bashls", {
+      filetypes = { "sh", "bash", "zsh" },
+    })
+
+    vim.lsp.enable {
+      "lua_ls",
+      "ts_ls",
+      "biome",
+      "html",
+      "cssls",
+      "tailwindcss",
+      "emmet_ls",
+      "prismals",
+      "pyright",
+      "bashls",
+    }
   end,
 }

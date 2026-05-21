@@ -5,6 +5,7 @@ return {
       ensure_installed = {
         "ts_ls",
         "lua_ls",
+        "bashls",
         "biome",
         "html",
         "cssls",
