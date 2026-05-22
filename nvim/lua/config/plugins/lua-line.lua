@@ -1,7 +1,7 @@
 return {
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = { "nvim-tree/nvim-web-devicons", "SmiteshP/nvim-navic" },
     config = function()
       local iceberg_transparent = require("lualine.themes.iceberg_dark")
       for _, mode in pairs(iceberg_transparent) do
@@ -48,7 +48,7 @@ return {
         sections = {
           lualine_a = { "mode" },
           lualine_b = { "branch", "diff", "diagnostics" },
-          lualine_c = { "filename" },
+          lualine_c = { "filename", { "navic", color_correction = "nil" } },
           lualine_x = { "encoding", "fileformat", "filetype" },
           lualine_y = { "progress" },
           lualine_z = { "location" },
