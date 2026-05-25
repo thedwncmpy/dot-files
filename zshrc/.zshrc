@@ -29,6 +29,17 @@ export PAGER="bat"
 export BAT_PAGER="less -RF"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export FZF_DEFAULT_OPTS="--cycle"
+
+open_url() {
+  if command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "$1" >/dev/null 2>&1 &
+  elif command -v open >/dev/null 2>&1; then
+    open "$1"
+  else
+    printf '%s\n' "$1"
+  fi
+}
+
 # Load Notion Integration
 if [[ -f "$HOME/.config/zshrc/notion/notion.zsh" ]]; then
   source "$HOME/.config/zshrc/notion/notion.zsh"
@@ -46,19 +57,24 @@ plugins=(
   zsh-interactive-cd
 )
 
-source $ZSH/oh-my-zsh.sh
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+  source "$ZSH/oh-my-zsh.sh"
+fi
 
 # ==========================================
 # 4. TOOL INITIALIZATIONS (Zoxide, Pyenv, FZF)
 # ==========================================
-eval "$(zoxide init zsh)"
-eval "$(pyenv init - zsh)"
-eval "$(codex completion zsh)"
-source <(fzf --zsh)
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+command -v pyenv >/dev/null 2>&1 && eval "$(pyenv init - zsh)"
+command -v codex >/dev/null 2>&1 && eval "$(codex completion zsh)"
+command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
 
 # Load p10k config if it exists
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
+if [[ -f "$HOME/.config/p10k/.p10k.zsh" ]]; then
+  source "$HOME/.config/p10k/.p10k.zsh"
+elif [[ -f "$HOME/.p10k.zsh" ]]; then
+  source "$HOME/.p10k.zsh"
+fi
 
 # ==========================================
 # 5. ALIASES
@@ -125,7 +141,7 @@ pdev() {
       local url=$(echo "$line" | grep -o 'http://localhost:[0-9]*')
       if [[ -n "$url" ]]; then
         echo "Opening $url"
-        open "$url"
+        open_url "$url"
         opened=true
       fi
     fi

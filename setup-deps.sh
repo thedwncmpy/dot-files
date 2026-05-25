@@ -1,138 +1,119 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Homebrew is expected to already be installed.
-if ! command -v brew >/dev/null 2>&1; then
-  echo "Error: Homebrew is not installed. Install Homebrew first: https://brew.sh"
+if [[ "${OSTYPE:-}" == darwin* ]]; then
+  echo "This branch is for Linux. Use the main branch for macOS."
   exit 1
 fi
 
-BREW_PREFIX="$(brew --prefix)"
+if ! command -v dnf >/dev/null 2>&1; then
+  echo "Error: this setup script currently supports Fedora/dnf only."
+  exit 1
+fi
 
-# Add a Homebrew tap only when it is missing.
-ensure_tap() {
-  local tap="$1"
-  if ! brew tap | grep -qx "$tap"; then
-    echo "Tapping $tap"
-    brew tap "$tap"
-  fi
-}
+DNF_REPO_FLAGS=()
+if dnf repolist --enabled | awk '{print $1}' | grep -qx tailscale-stable; then
+  DNF_REPO_FLAGS+=(--disablerepo=tailscale-stable)
+fi
 
-install_formulae() {
-  local formulae=(
-    neovim
-    tmux
-    tpm
+install_fedora_packages() {
+  local packages=(
+    zsh
     git
+    curl
+    jq
+    tmux
+    neovim
     ripgrep
-    fd
+    fd-find
     fzf
     bat
     lsd
     zoxide
-    pyenv
-    nvm
+    python3
+    python3-pip
+    python3-virtualenv
+    make
+    gcc
+    gcc-c++
+    unzip
+    nodejs
+    npm
     pnpm
-    lazygit
-    lua-language-server
-    stylua
-    prettierd
-    eslint_d
     black
     isort
     pylint
+    shfmt
+    xdg-utils
   )
 
-  for pkg in "${formulae[@]}"; do
-    if brew list --formula "$pkg" >/dev/null 2>&1; then
-      echo "[ok] $pkg already installed"
-    else
-      echo "Installing $pkg"
-      brew install "$pkg"
-    fi
-  done
+  sudo dnf "${DNF_REPO_FLAGS[@]}" install -y "${packages[@]}"
 }
 
-install_casks() {
-  local casks=(
-    ghostty
-    font-lilex-nerd-font
-  )
+install_optional_dnf_package() {
+  local package="$1"
+  local fallback="$2"
 
-  for cask in "${casks[@]}"; do
-    if brew list --cask "$cask" >/dev/null 2>&1; then
-      echo "[ok] $cask already installed"
-    else
-      echo "Installing $cask"
-      brew install --cask "$cask"
-    fi
-  done
+  if dnf "${DNF_REPO_FLAGS[@]}" list --available "$package" >/dev/null 2>&1; then
+    sudo dnf "${DNF_REPO_FLAGS[@]}" install -y "$package"
+  else
+    printf '\nNote: %s is not available in the enabled Fedora repositories.\n%s\n' "$package" "$fallback"
+  fi
 }
 
-# Install Oh My Zsh plus theme/plugins used by this config.
+clone_or_skip() {
+  local repo="$1"
+  local dest="$2"
+
+  if [[ -d "$dest" ]]; then
+    echo "[ok] $dest already exists"
+  else
+    git clone --depth=1 "$repo" "$dest"
+  fi
+}
+
 install_oh_my_zsh_stack() {
   local ohmyzsh_dir="$HOME/.oh-my-zsh"
   local custom_dir="${ZSH_CUSTOM:-$ohmyzsh_dir/custom}"
 
-  if [[ ! -d "$ohmyzsh_dir" ]]; then
-    echo "Installing Oh My Zsh"
-    RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  else
-    echo "[ok] Oh My Zsh already installed"
-  fi
-
+  clone_or_skip https://github.com/ohmyzsh/ohmyzsh.git "$ohmyzsh_dir"
   mkdir -p "$custom_dir/plugins" "$custom_dir/themes"
 
-  if [[ ! -d "$custom_dir/themes/powerlevel10k" ]]; then
-    echo "Installing powerlevel10k theme"
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$custom_dir/themes/powerlevel10k"
-  else
-    echo "[ok] powerlevel10k already installed"
-  fi
-
-  if [[ ! -d "$custom_dir/plugins/zsh-autosuggestions" ]]; then
-    echo "Installing zsh-autosuggestions"
-    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$custom_dir/plugins/zsh-autosuggestions"
-  else
-    echo "[ok] zsh-autosuggestions already installed"
-  fi
-
-  if [[ ! -d "$custom_dir/plugins/zsh-syntax-highlighting" ]]; then
-    echo "Installing zsh-syntax-highlighting"
-    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$custom_dir/plugins/zsh-syntax-highlighting"
-  else
-    echo "[ok] zsh-syntax-highlighting already installed"
-  fi
-
-  if [[ ! -d "$custom_dir/plugins/zsh-interactive-cd" ]]; then
-    echo "Installing zsh-interactive-cd"
-    git clone --depth=1 https://github.com/changyuheng/zsh-interactive-cd.git "$custom_dir/plugins/zsh-interactive-cd"
-  else
-    echo "[ok] zsh-interactive-cd already installed"
-  fi
+  clone_or_skip https://github.com/romkatv/powerlevel10k.git "$custom_dir/themes/powerlevel10k"
+  clone_or_skip https://github.com/zsh-users/zsh-autosuggestions "$custom_dir/plugins/zsh-autosuggestions"
+  clone_or_skip https://github.com/zsh-users/zsh-syntax-highlighting.git "$custom_dir/plugins/zsh-syntax-highlighting"
+  clone_or_skip https://github.com/changyuheng/zsh-interactive-cd.git "$custom_dir/plugins/zsh-interactive-cd"
 }
 
-# Print post-install actions that still require user interaction.
+install_tpm() {
+  mkdir -p "$HOME/.tmux/plugins"
+  clone_or_skip https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+}
+
 print_follow_up() {
-  cat <<MSG
+  cat <<'MSG'
 
 Done. Next steps:
-1. Symlink your config files into place if you haven't already.
-2. Start tmux and install TPM plugins with: prefix + I
-3. Run nvim once so lazy.nvim/mason can finish plugin and LSP setup.
-4. Restart your shell to pick up zsh changes.
+1. Symlink or copy repo configs into ~/.config.
+2. Point ~/.zshrc at ~/.config/zshrc/.zshrc, or copy zshrc/root.zshrc to ~/.zshrc.
+3. Start tmux and install TPM plugins with: prefix + I
+4. Run nvim once so lazy.nvim and mason can finish plugin/LSP setup.
+5. Switch login shell if needed: chsh -s /usr/bin/zsh
 
-Note: this script does not install Codex or Gemini CLIs.
+Optional tools not installed by this script:
+- pyenv
+- nvm
+- Gemini CLI
+- Notion secrets file
 MSG
 }
 
-# Run full dependency setup in a predictable order.
 main() {
-  ensure_tap homebrew/cask-fonts
-  brew update
-  install_formulae
-  install_casks
+  install_fedora_packages
+  install_optional_dnf_package ghostty "Enable a Ghostty COPR or install Ghostty from its official Linux packages."
+  install_optional_dnf_package lazygit "Install it through your preferred COPR or with: go install github.com/jesseduffield/lazygit@latest"
   install_oh_my_zsh_stack
+  install_tpm
   print_follow_up
 }
 

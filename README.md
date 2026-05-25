@@ -1,12 +1,56 @@
 # Dotfiles Overview
 
-This repository contains terminal-first development configuration for Ghostty, tmux, zsh, and Neovim.
+This branch contains the Linux version of the terminal-first development
+configuration for Ghostty, tmux, zsh, and Neovim.
+
+## Linux Setup
+
+This branch currently targets Fedora.
+
+Install native dependencies and shell/tmux plugin managers:
+
+```bash
+./setup-deps.sh
+```
+
+Then install the configs:
+
+```bash
+mkdir -p ~/.config
+cp -a ghostty nvim p10k tmux zshrc ~/.config/
+cp zshrc/root.zshrc ~/.zshrc
+```
+
+Switch the login shell to zsh:
+
+```bash
+chsh -s /usr/bin/zsh
+```
+
+After logging out and back in:
+
+```bash
+nvim
+tmux
+```
+
+Neovim will use `lazy.nvim` and Mason to finish plugin, formatter, and LSP
+installation. tmux plugins can be installed with `prefix + I`; this branch also
+uses the standard Linux tmux entrypoint at `~/.config/tmux/tmux.conf`.
+
+Optional tools that are referenced but not installed by `setup-deps.sh`:
+
+- `pyenv`
+- `nvm`
+- Gemini CLI
+- Notion integration secrets in `~/.config/zshrc/notion/secrets.zsh`
 
 ## Ghostty
 
 Configured in `ghostty/config`.
 
-Ghostty is the terminal emulator. The config uses `Lilex Nerd Font`, 20pt text, a pure black background, balanced padding, a transparent macOS titlebar, saved window state, and Display P3 color.
+Ghostty is the terminal emulator. The config uses `Lilex Nerd Font`, 20pt text,
+a pure black background, balanced padding, and saved window state.
 
 ## tmux
 
