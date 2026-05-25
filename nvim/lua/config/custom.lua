@@ -23,7 +23,7 @@ vim.api.nvim_create_autocmd("FileChangedShellPost", {
   callback = function() vim.notify("File reloaded from disk", vim.log.levels.INFO, { title = "nvim" }) end,
 })
 
--- Run gemini in non-interactive mode with a prompt in a floating window
+-- Run Antigravity in non-interactive mode with a prompt in a floating window
 vim.api.nvim_create_user_command("Ask", function(opts)
   local prompt = opts.args
   if prompt == "" then
@@ -51,7 +51,7 @@ vim.api.nvim_create_user_command("Ask", function(opts)
   })
 
   -- Run terminal command
-  vim.fn.termopen("gemini -p " .. vim.fn.shellescape(prompt))
+  vim.fn.termopen("agy -p " .. vim.fn.shellescape(prompt))
 
   -- Start in insert mode
   vim.cmd "startinsert"
@@ -65,5 +65,5 @@ vim.api.nvim_create_user_command("Ask", function(opts)
   -- })
 end, {
   nargs = "*",
-  desc = "Run gemini in non-interactive mode with a prompt in a floating window",
+  desc = "Run Antigravity in non-interactive mode with a prompt in a floating window",
 })

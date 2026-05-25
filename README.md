@@ -42,7 +42,7 @@ Optional tools that are referenced but not installed by `setup-deps.sh`:
 
 - `pyenv`
 - `nvm`
-- Gemini CLI
+- Antigravity CLI
 - Notion integration secrets in `~/.config/zshrc/notion/secrets.zsh`
 
 ## Ghostty

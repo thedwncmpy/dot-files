@@ -103,7 +103,7 @@ Done. Next steps:
 Optional tools not installed by this script:
 - pyenv
 - nvm
-- Gemini CLI
+- Antigravity CLI
 - Notion secrets file
 MSG
 }
