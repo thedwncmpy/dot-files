@@ -23,6 +23,13 @@ path=(
   $path
 )
 
+# Load nvm before tools that depend on Node.js, including Neovim LSP servers.
+export NVM_DIR="$HOME/.nvm"
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  source "$NVM_DIR/nvm.sh"
+  nvm use --silent default >/dev/null
+fi
+
 export EDITOR=$(command -v nvim || echo "vi")
 export VISUAL=$(command -v nvim || echo "vi")
 export PAGER="bat"
