@@ -19,6 +19,15 @@ return {
       filetypes = { "sh", "bash", "zsh" },
     })
 
+    vim.lsp.config("gopls", {
+      filetypes = { "go", "gomod", "gowork", "gotmpl" },
+    })
+
+    vim.lsp.config("sourcekit_lsp", {
+      cmd = { "sourcekit-lsp" },
+      filetypes = { "swift", "objective-c", "objective-cpp" },
+    })
+
     vim.lsp.enable {
       "lua_ls",
       "ts_ls",
@@ -30,6 +39,8 @@ return {
       "prismals",
       "pyright",
       "bashls",
+      "gopls",
+      "sourcekit_lsp",
     }
   end,
 }

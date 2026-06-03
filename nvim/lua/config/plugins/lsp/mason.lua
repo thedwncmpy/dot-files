@@ -13,6 +13,7 @@ return {
         "emmet_ls",
         "prismals",
         "pyright",
+        "gopls",
       },
       automatic_installation = true,
     },

@@ -28,6 +28,8 @@ return {
 
     local tele = require "telescope"
     local actions = require "telescope.actions"
+    local themes = require "telescope.themes"
+
     tele.setup {
       defaults = {
         mappings = {
@@ -40,13 +42,15 @@ return {
             ["<C-k>"] = actions.move_selection_previous,
           },
         },
-        layout_strategy = "vertical",
+        layout_strategy = "horizontal",
         layout_config = {
-          vertical = {
-            mirror = true,
+          horizontal = {
             prompt_position = "top",
+            preview_width = 0.5,
             preview_cutoff = 0,
           },
+          width = 0.9,
+          height = 0.85,
         },
         sorting_strategy = "ascending",
       },
