@@ -54,11 +54,11 @@ source $ZSH/oh-my-zsh.sh
 eval "$(zoxide init zsh)"
 eval "$(pyenv init - zsh)"
 eval "$(codex completion zsh)"
+eval "$(ns completion zsh)"
 source <(fzf --zsh)
 
 # Load p10k config if it exists
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
 
 # ==========================================
 # 5. ALIASES
@@ -115,7 +115,6 @@ mkcd() {
   mkdir -p -- "$1" && cd -- "$1"
 }
 
-
 # Smart PNPM Dev: Runs dev and auto-opens localhost in browser
 pdev() {
   local opened=false
@@ -150,7 +149,7 @@ compdef _cheat_completions cheat
 function _auto_activate_venv() {
   # 1. ACTIVATE: If we enter a dir with .venv and it's not already active
   if [[ -d .venv || -d venv ]]; then
-    local venv_path=$( [[ -d .venv ]] && echo ".venv" || echo "venv" )
+    local venv_path=$([[ -d .venv ]] && echo ".venv" || echo "venv")
 
     # Only source if we aren't already in THIS specific venv
     if [[ "$VIRTUAL_ENV" != "$(pwd)/$venv_path" ]]; then
@@ -198,6 +197,6 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 
 #NVM
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
