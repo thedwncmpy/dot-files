@@ -4,6 +4,17 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons", "SmiteshP/nvim-navic" },
     config = function()
       local iceberg_transparent = require("lualine.themes.iceberg_dark")
+      local mode_colors = {
+        n = "#3b82f6",
+        i = "#22c55e",
+        v = "#eab308",
+        V = "#eab308",
+        ["\22"] = "#eab308",
+        R = "#ef4444",
+        c = "#f97316",
+        t = "#14b8a6",
+      }
+
       for _, mode in pairs(iceberg_transparent) do
         for _, section in pairs(mode) do
           section.bg = nil
@@ -17,7 +28,7 @@ return {
           icons_enabled = true,
           theme = iceberg_transparent,
           component_separators = { left = "", right = "" },
-          section_separators = { left = "", right = "" },
+          section_separators = { left = "", right = "" },
           disabled_filetypes = {
             statusline = {},
             winbar = {},
@@ -46,7 +57,18 @@ return {
           },
         },
         sections = {
-          lualine_a = { "mode" },
+          lualine_a = {
+            {
+              "mode",
+              color = function()
+                return {
+                  fg = "#ffffff",
+                  bg = mode_colors[vim.fn.mode()] or "#3b82f6",
+                  gui = "bold",
+                }
+              end,
+            },
+          },
           lualine_b = { "branch", "diff", "diagnostics" },
           lualine_c = { "filename", { "navic", color_correction = "nil" } },
           lualine_x = { "encoding", "fileformat", "filetype" },

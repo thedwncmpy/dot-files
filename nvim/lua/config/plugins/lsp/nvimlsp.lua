@@ -26,6 +26,17 @@ return {
     vim.lsp.config("sourcekit_lsp", {
       cmd = { "sourcekit-lsp" },
       filetypes = { "swift", "objective-c", "objective-cpp" },
+      root_dir = function(bufnr, on_dir)
+        local root = vim.fs.root(bufnr, function(name, _)
+          return name == "Package.swift"
+            or name == ".git"
+            or name:match("%.xcodeproj$")
+            or name:match("%.xcworkspace$")
+        end)
+
+        on_dir(root)
+      end,
+      workspace_required = true,
     })
 
     vim.lsp.enable {
