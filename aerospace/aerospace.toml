@@ -136,6 +136,7 @@ automatically-unhide-macos-hidden-apps = false
     alt-shift-3 = [ 'move-node-to-workspace 3', 'workspace 3' ]
 
     alt-shift-f = 'fullscreen'
+    alt-q = 'close --quit-if-last-window'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
     alt-tab = 'workspace-back-and-forth'
