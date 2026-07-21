@@ -37,7 +37,11 @@ fi
 # ==========================================
 # 3. OH-MY-ZSH CONFIGURATION
 # ==========================================
-ZSH_THEME="powerlevel10k/powerlevel10k"
+if [[ -d "$ZSH/custom/themes/powerlevel10k" ]]; then
+  ZSH_THEME="powerlevel10k/powerlevel10k"
+elif [[ -r /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme ]]; then
+  source /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
+fi
 
 plugins=(
   git
@@ -84,7 +88,7 @@ alias lg='lsd -F --group-dirs=first'
 alias tree="lsd -AF --tree --ignore-glob='**/{node_modules,.next,.git}'"
 
 # Git
-alias gs='git status'
+alias gs='git status --short --branch'
 alias gcm='git commit -m'
 alias gp='git push'
 alias gpp='git pull'

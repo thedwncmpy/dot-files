@@ -20,7 +20,7 @@ return {
       },
       checkbox = {
         checked = {
-          scope_highlight = " @markup.strikethrough",
+          scope_highlight = "@markup.strikethrough",
         },
       },
       pipe_table = {

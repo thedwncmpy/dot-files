@@ -28,8 +28,10 @@ vim.keymap.set("n", "<M-C-l>", ":bnext<CR>", { noremap = true, silent = true, de
 vim.keymap.set("n", "<leader>q", ":qa<CR>", { desc = "Quit all" })
 
 -- MOVING TEXT (Visual Mode)
-vim.keymap.set("x", "<C-j>", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move block down" })
-vim.keymap.set("x", "<C-k>", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move block up" })
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move block down" })
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move block up" })
+vim.keymap.set("v", "<leader>j", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move block down" })
+vim.keymap.set("v", "<leader>k", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move block up" })
 
 -- SNIPPET JUMPING (Select Mode)
 vim.keymap.set(

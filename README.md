@@ -1,6 +1,6 @@
 # Dotfiles Overview
 
-This repository contains terminal-first development configuration for Ghostty, tmux, zsh, and Neovim.
+this repository contains terminal-first development configuration for Ghostty, tmux, zsh, and Neovim.
 
 ## Ghostty
 

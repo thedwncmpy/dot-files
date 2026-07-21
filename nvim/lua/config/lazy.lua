@@ -71,3 +71,27 @@ vim.opt.autoread = true
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldlevel = 99
+
+local function strip_ansi(s) return s:gsub("\27%[[0-9;]*m", "") end
+
+vim.api.nvim_create_autocmd("BufWritePost", {
+  pattern = "*.md",
+  callback = function(args)
+    vim.fn.jobstart({ "ns", "watch-upload", args.file }, {
+      stdout_buffered = true,
+      stderr_buffered = true,
+      on_stdout = function(_, data)
+        for _, line in ipairs(data or {}) do
+          line = strip_ansi(line)
+          if line ~= "" then vim.schedule(function() vim.api.nvim_echo({ { line, "None" } }, false, {}) end) end
+        end
+      end,
+      on_stderr = function(_, data)
+        for _, line in ipairs(data or {}) do
+          line = strip_ansi(line)
+          if line ~= "" then vim.schedule(function() vim.api.nvim_echo({ { line, "WarningMsg" } }, false, {}) end) end
+        end
+      end,
+    })
+  end,
+})

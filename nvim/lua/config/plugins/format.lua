@@ -4,6 +4,10 @@ return {
   config = function()
     local conform = require "conform"
 
+    local function markdown_format_enabled(bufnr)
+      return vim.bo[bufnr].filetype ~= "markdown" or vim.b[bufnr].markdown_format_enabled == true
+    end
+
     conform.setup {
       formatters_by_ft = {
         javascript = { "prettier" },
@@ -22,12 +26,23 @@ return {
         lua = { "stylua" },
         python = { "isort", "black" },
       },
-      format_on_save = {
-        lsp_fallback = true,
-        async = false,
-        timeout_ms = 3000,
-      },
+      format_on_save = function(bufnr)
+        if not markdown_format_enabled(bufnr) then return nil end
+        return {
+          lsp_fallback = true,
+          async = false,
+          timeout_ms = 3000,
+        }
+      end,
     }
+
+    vim.api.nvim_create_user_command("MarkdownFormatToggle", function()
+      vim.b.markdown_format_enabled = not vim.b.markdown_format_enabled
+      local state = vim.b.markdown_format_enabled and "enabled" or "disabled"
+      vim.notify("Markdown formatting " .. state .. " for this buffer")
+    end, { desc = "Toggle Markdown formatting for the current buffer" })
+
+    vim.keymap.set("n", "<leader>mf", "<cmd>MarkdownFormatToggle<CR>", { desc = "Toggle Markdown formatting" })
 
     vim.keymap.set({ "n", "v", "i" }, "<C-s>", function()
       -- If in Insert mode, escape to Normal mode first
@@ -36,11 +51,13 @@ return {
       end
 
       -- 1. Format the file or range
-      conform.format {
-        lsp_fallback = true,
-        async = false,
-        timeout_ms = 1000,
-      }
+      if markdown_format_enabled(0) then
+        conform.format {
+          lsp_fallback = true,
+          async = false,
+          timeout_ms = 1000,
+        }
+      end
 
       -- 2. Save the file
       vim.cmd "write"
