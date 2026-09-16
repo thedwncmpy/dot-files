@@ -28,7 +28,7 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 # See: https://nikitabobko.github.io/AeroSpace/guide#layouts
 # The 'accordion-padding' specifies the size of accordion padding
 # You can set 0 to disable the padding feature
-accordion-padding = 20
+accordion-padding = 10
 
 # Possible values: tiles|accordion
 default-root-container-layout = 'tiles'
@@ -135,7 +135,7 @@ automatically-unhide-macos-hidden-apps = false
     alt-shift-2 = [ 'move-node-to-workspace 2', 'workspace 2' ]
     alt-shift-3 = [ 'move-node-to-workspace 3', 'workspace 3' ]
 
-    alt-shift-f = 'fullscreen'
+    alt-enter = 'fullscreen'
     alt-q = 'close --quit-if-last-window'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth

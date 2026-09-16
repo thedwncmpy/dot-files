@@ -72,6 +72,7 @@ alias c='clear'
 alias vs='code .'
 alias cd='z'
 alias cdi='zi'
+alias ai='codex'
 
 # Terminal/Editor (Using Bat & FZF)
 alias nv='nvim'
@@ -81,7 +82,8 @@ alias view='fzf'
 alias ivs='nvim $(fzf -m --preview="bat --color=always {}")'
 
 # LSD (Modern ls)
-alias ls='lsd -1F --group-dirs=first'
+alias ls='lsd'
+alias lsl='lsd -1'
 alias la='lsd -AF --group-dirs=first'
 alias ll='lsd -lAF --group-dirs=first'
 alias lg='lsd -F --group-dirs=first'
