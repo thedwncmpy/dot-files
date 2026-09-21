@@ -20,9 +20,9 @@ vim.keymap.set("n", "<leader>c", ":bdelete<CR>", { noremap = true, silent = true
 vim.keymap.set("n", "<C-[>", ":BufferLineMovePrev<CR>", { noremap = true, silent = true, desc = "Move buffer left" })
 vim.keymap.set("n", "<C-]>", ":BufferLineMoveNext<CR>", { noremap = true, silent = true, desc = "Move buffer right" })
 
--- Navigate: Use Ctrl + Option + H and L to cycle between open buffers
-vim.keymap.set("n", "<M-C-h>", ":bprev<CR>", { noremap = true, silent = true, desc = "Prev buffer" })
-vim.keymap.set("n", "<M-C-l>", ":bnext<CR>", { noremap = true, silent = true, desc = "Next buffer" })
+-- Navigate: Use Option + H and L to cycle between open buffers
+vim.keymap.set("n", "<M-h>", ":bprev<CR>", { noremap = true, silent = true, desc = "Prev buffer" })
+vim.keymap.set("n", "<M-l>", ":bnext<CR>", { noremap = true, silent = true, desc = "Next buffer" })
 
 -- WINDOWS & QUITTING
 vim.keymap.set("n", "<leader>q", ":qa<CR>", { desc = "Quit all" })
