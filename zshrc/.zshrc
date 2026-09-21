@@ -72,7 +72,7 @@ alias c='clear'
 alias vs='code .'
 alias cd='z'
 alias cdi='zi'
-alias ai='codex'
+alias ai='codex-right'
 
 # Terminal/Editor (Using Bat & FZF)
 alias nv='nvim'
@@ -112,6 +112,23 @@ alias tsc='tmux switch-client -t'
 
 #AI
 alias ask="gemini -p"
+
+# Open a fresh Codex session in a right-hand tmux pane.
+# The function is kept local to zsh so invoking it has virtually no startup
+# overhead; each invocation still starts a new Codex conversation.
+codex-right() {
+  if ! command -v tmux >/dev/null 2>&1; then
+    print -u2 "codex-right: tmux is not installed"
+    return 1
+  fi
+
+  if [[ -n "$TMUX" ]]; then
+    tmux split-window -h -c "$PWD" codex
+  else
+    tmux new-session -A -s main -c "$PWD" \; split-window -h -c "$PWD" codex
+  fi
+}
+
 # ==========================================
 # 6. CUSTOM FUNCTIONS & SETTINGS
 # ==========================================
