@@ -132,7 +132,39 @@ vim.api.nvim_create_autocmd("BufWinLeave", {
   callback = disable_reader,
 })
 
-if vim.g.markdown_reader_auto ~= false then enable_reader() end
+if not vim.g.markdown_reader_tab_autocmd then
+  vim.g.markdown_reader_tab_autocmd = true
+
+  vim.api.nvim_create_autocmd({ "TabEnter", "TabNew" }, {
+    group = reader_group,
+    callback = function()
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        if vim.w[win].markdown_reader_enabled then
+          vim.api.nvim_win_call(win, disable_reader)
+        end
+      end
+    end,
+  })
+end
+
+local another_markdown_buffer_is_open = false
+for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+  if buf ~= vim.api.nvim_get_current_buf()
+    and vim.api.nvim_buf_is_valid(buf)
+    and vim.bo[buf].filetype == "markdown"
+    and vim.bo[buf].buftype == ""
+  then
+    another_markdown_buffer_is_open = true
+    break
+  end
+end
+
+if vim.g.markdown_reader_auto ~= false
+  and #vim.api.nvim_list_tabpages() == 1
+  and not another_markdown_buffer_is_open
+then
+  enable_reader()
+end
 
 local undo_ftplugin = vim.b.undo_ftplugin
 local undo_reader = table.concat({
