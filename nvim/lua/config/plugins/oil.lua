@@ -64,6 +64,50 @@ return {
           -- windows when switching tabs.
           tmux_show_only_in_active_window = true,
         },
+        config = function(_, opts)
+          local image = require("image")
+          image.setup(opts)
+
+          local pane_id = vim.env.TMUX_PANE
+          if not pane_id then return end
+
+          local picker_open = false
+          local restore_images = false
+          vim.fn.timer_start(200, function()
+            if not picker_open and #image.get_images() == 0 then return end
+
+            local result = vim.fn.system({ "tmux", "display-message", "-p", "-t", pane_id, "#{pane_mode}|#{client_tty}" })
+            if vim.v.shell_error ~= 0 then return end
+            local mode, client_tty = result:match("^([^|]*)|([^\n]*)")
+            if not mode then return end
+
+            local in_picker = mode == "tree-mode"
+            if in_picker == picker_open then return end
+
+            picker_open = in_picker
+            if in_picker then
+              restore_images = image.is_enabled()
+              if not restore_images then return end
+
+              -- tmux can hold pane output in choose-tree; send Kitty deletes to the client TTY.
+              if client_tty ~= "" then
+                local tty = io.open(client_tty, "w")
+                if tty then
+                  for _, current_image in ipairs(image.get_images()) do
+                    if current_image.is_rendered then
+                      tty:write(("\27_Ga=d,d=i,i=%d,q=2\27\\"):format(current_image.internal_id))
+                    end
+                  end
+                  tty:close()
+                end
+              end
+              image.disable()
+            elseif restore_images then
+              image.enable()
+              restore_images = false
+            end
+          end, { ["repeat"] = -1 })
+        end,
       },
     },
     -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
