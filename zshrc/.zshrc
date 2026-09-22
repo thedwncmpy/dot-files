@@ -113,21 +113,32 @@ alias tsc='tmux switch-client -t'
 #AI
 alias ask="gemini -p"
 
-# Open a fresh Codex session in a right-hand tmux pane.
-# The function is kept local to zsh so invoking it has virtually no startup
-# overhead; each invocation still starts a new Codex conversation.
-codex-right() {
+# Open Codex in a right-hand tmux pane. `ai` starts a fresh session; `air`
+# opens Codex's saved-session picker.
+_codex_right_pane() {
+  local codex_command="$1"
+
   if ! command -v tmux >/dev/null 2>&1; then
-    print -u2 "codex-right: tmux is not installed"
+    print -u2 "Codex pane: tmux is not installed"
     return 1
   fi
 
   if [[ -n "$TMUX" ]]; then
-    tmux split-window -h -c "$PWD" codex
+    tmux split-window -h -c "$PWD" "$codex_command"
   else
-    tmux new-session -A -s main -c "$PWD" \; split-window -h -c "$PWD" codex
+    tmux new-session -A -s main -c "$PWD" \; split-window -h -c "$PWD" "$codex_command"
   fi
 }
+
+codex-right() {
+  _codex_right_pane 'codex'
+}
+
+codex-resume-right() {
+  _codex_right_pane 'codex resume'
+}
+
+alias air='codex-resume-right'
 
 # ==========================================
 # 6. CUSTOM FUNCTIONS & SETTINGS
