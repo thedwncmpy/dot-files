@@ -17,6 +17,14 @@ tmux manages persistent terminal sessions, windows, and panes. The config uses
 clipboard integration, and focus events for Neovim. New sessions automatically
 create `editor`, `ai`, and `server` windows.
 
+Press `C-a s` to edit sessions in a Neovim popup. Each line has a session ID and
+name. Reorder lines with Vim commands (`ddp`, `:m`, or visual `J`/`K`), edit a
+name to rename it, add a name on a new line to create a session, or delete a
+line to remove one. `:w` applies edits and saves the order across tmux restarts;
+deletions require confirmation. Enter switches to the session under the cursor;
+`1`–`9` switch to those rows and `0` to the tenth. `R` refreshes the list, and
+`q` closes the popup.
+
 Plugins are managed with TPM and include:
 
 - `christoomey/vim-tmux-navigator` for seamless Neovim/tmux navigation
