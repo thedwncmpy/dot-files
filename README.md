@@ -1,12 +1,39 @@
 # Dotfiles Overview
 
-this repository contains terminal-first development configuration for Ghostty, tmux, zsh, and Neovim.
+This repository contains terminal-first development configuration for macOS,
+including Ghostty, AeroSpace, tmux, zsh, and Neovim.
+
+## Setup
+
+`setup-deps.sh` installs the Homebrew formulae, casks, Oh My Zsh, Powerlevel10k,
+and zsh plugins used by this configuration. Homebrew must be installed first.
+
+```shell
+./setup-deps.sh
+```
+
+After the script completes, symlink the configuration files into their expected
+locations, install tmux plugins with `C-a I`, start Neovim once to finish its
+plugin and language-server setup, and restart the shell.
 
 ## Ghostty
 
 Configured in `ghostty/config`.
 
 Ghostty is the terminal emulator. The config uses `Lilex Nerd Font`, 20pt text, a pure black background, balanced padding, a transparent macOS titlebar, saved window state, and Display P3 color.
+
+## AeroSpace
+
+Configured in `aerospace/aerospace.toml` and intended to be copied to
+`~/.aerospace.toml`.
+
+AeroSpace provides tiling window management with automatic login startup,
+three workspace bindings, monitor assignment, mouse-following focus, compact
+window gaps, and service-mode controls for layout and volume management.
+
+Key bindings include `Ctrl-Alt-H/J/K/L` for focus, `Alt-Shift-H/J/K/L` for
+moving windows, `Alt-1/2/3` for workspaces, `Alt-/` for tiled layouts, and
+`Alt-,` for accordion layouts.
 
 ## tmux
 
@@ -58,6 +85,18 @@ Notable shell tooling:
 
 The shell also auto-activates `.venv` or `venv` Python environments when
 entering a project directory and deactivates them when leaving.
+
+## Powerlevel10k
+
+Configured in `p10k/.p10k.zsh`.
+
+The prompt uses Powerlevel10k's lean, two-line style with ASCII symbols. The
+first line shows the current directory and Git status; the second line shows
+the prompt character. The right prompt includes command status, execution time,
+environment/tooling indicators, and the current time. Transient and verbose
+instant prompts are enabled for a compact interactive experience.
+
+Run `p10k configure` to regenerate the configuration interactively.
 
 ## Neovim
 
