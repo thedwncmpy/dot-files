@@ -62,9 +62,6 @@ vim.keymap.set(
 
 -- OIL.NVIM
 vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
-vim.api.nvim_create_user_command("TmuxSessions", function()
-  require("tmux_sessions").open()
-end, { desc = "Edit tmux sessions in a buffer" })
 -- Definition Lookup
 vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "LSP Definition" })
 -- ========================================================================== --
