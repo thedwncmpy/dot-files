@@ -7,3 +7,4 @@ ns-cli/secrets.zsh
 *.log
 
 tmux/session-order.json
+tmux-oil/

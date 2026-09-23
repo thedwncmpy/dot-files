@@ -26,6 +26,9 @@ and `0` to the tenth. `R` refreshes and `q` closes the popup.
 If edits are unsaved, `q` asks for confirmation: `y` discards and closes,
 while `n` returns to editing.
 
+The session manager lives in its own `tmux-oil/` project. The binding uses a
+Homebrew-installed `tmux-oil` when available and falls back to the local copy.
+
 Plugins are managed with TPM and include:
 
 - `christoomey/vim-tmux-navigator` for seamless Neovim/tmux navigation
