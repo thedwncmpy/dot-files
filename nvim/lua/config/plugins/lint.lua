@@ -1,3 +1,4 @@
+-- Configure filetype-specific linters and run them after each save.
 return {
   "mfussenegger/nvim-lint",
   -- Change the event to only load the plugin when a buffer is read/created

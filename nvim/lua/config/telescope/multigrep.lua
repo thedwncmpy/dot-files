@@ -1,3 +1,4 @@
+-- Build a Telescope live grep picker that accepts an optional glob filter.
 local pickers = require "telescope.pickers"
 local finders = require "telescope.finders"
 local make_entry = require "telescope.make_entry"
@@ -6,12 +7,14 @@ local conf = require "telescope.config".values
 local M = {}
 
 local live_multigrep = function(opts)
+  -- Create an asynchronous ripgrep finder using `term  glob` prompt syntax.
   opts = opts or {}
   opts.cwd = opts.cwd or vim.uv.cwd()
 
   local finder = finders.new_async_job {
     -- Prompt format: `search_term  glob_pattern` (double-space delimiter).
     command_generator = function(prompt)
+      -- Build rg arguments from the search term and optional glob.
       if not prompt or prompt == "" then
         return nil
       end
@@ -48,7 +51,7 @@ local live_multigrep = function(opts)
 end
 
 M.setup = function()
-  -- Register multigrep picker keymap from a single setup call.
+  -- Bind the custom picker to the standard find-grep leader mapping.
   vim.keymap.set("n", "<leader>fg", live_multigrep, { desc = "Telescope Multi Grep" })
 end
 

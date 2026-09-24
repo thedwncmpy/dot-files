@@ -1,3 +1,4 @@
+# Selene lint configuration for the Neovim Lua environment.
 std = "neovim"
 
 [rules]

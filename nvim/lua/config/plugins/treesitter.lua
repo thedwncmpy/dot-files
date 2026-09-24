@@ -1,3 +1,4 @@
+-- Configure Tree-sitter parsers, highlighting, and language-specific features.
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -7,11 +8,12 @@ return {
       vim.treesitter.language.register("bash", "zsh")
 
       require("nvim-treesitter.configs").setup {
-        ensure_installed = { "bash", "prisma", "c", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
+        ensure_installed = { "bash", "prisma", "c", "css", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
         auto_install = false,
         highlight = {
           enable = true,
           disable = function(lang, buf)
+            -- Skip shell highlights and large files that can slow parsing.
             local ft = vim.bo[buf].filetype
             if ft == "zsh" then return true end
             if lang == "zsh" then return true end

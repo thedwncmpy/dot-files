@@ -6,6 +6,7 @@ if [[ -f "$HOME/.config/zshrc/notion/secrets.zsh" ]]; then
 fi
 
 _get_notion_id() {
+  # Resolve a local notebook alias to its Notion page identifier.
   case "$1" in
     "scratch")  echo "32f73c7809a980b5a915f2ed8b4569f1" ;;
     "blogs")    echo "31873c7809a9805a9600e0a68b526073" ;;
@@ -17,6 +18,7 @@ _get_notion_id() {
 }
 
 notion-note() {
+  # Create a Notion note in the selected notebook.
   local NOTEBOOK_NAME="$1"
   shift 
   local NOTE_TEXT="$*"
@@ -56,6 +58,7 @@ notion-note() {
 }
 
 notion-upload() {
+  # Convert a Markdown note and create or replace its Notion page blocks.
   local file="$1"
   if [[ ! -f "$file" ]]; then
     echo "Error: File '$file' not found."
@@ -155,6 +158,7 @@ notion-upload() {
 }
 
 notion-download() {
+  # Fetch a Notion page and overwrite its matching local Markdown file.
   local file="$1"
   if [[ -z "$file" ]]; then
     echo "Usage: notion-download <file>"

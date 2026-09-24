@@ -11,18 +11,21 @@ vim.opt_local.joinspaces = false
 
 local reader_group = vim.api.nvim_create_augroup("markdown_reader_mode", { clear = false })
 
+-- Apply a set of window-local options from a saved or requested state table.
 local function set_window_options(options)
   for option, value in pairs(options) do
     vim.wo[option] = value
   end
 end
 
+-- Apply a set of global options from a saved or requested state table.
 local function set_global_options(options)
   for option, value in pairs(options) do
     vim.o[option] = value
   end
 end
 
+-- Save the current window and global options before entering reader mode.
 local function save_state()
   vim.w.markdown_reader_window_state = {
     number = vim.wo.number,
@@ -52,6 +55,7 @@ local function save_state()
   }
 end
 
+-- Switch the current Markdown window and editor UI into reading mode.
 local function enable_reader()
   if vim.w.markdown_reader_enabled then return end
 
@@ -86,6 +90,7 @@ local function enable_reader()
   }
 end
 
+-- Restore the window and global options captured before reader mode began.
 local function disable_reader()
   if not vim.w.markdown_reader_enabled then return end
 
@@ -101,6 +106,7 @@ local function disable_reader()
   vim.w.markdown_reader_enabled = false
 end
 
+-- Toggle the current window between normal editing and reader mode.
 local function toggle_reader()
   if vim.w.markdown_reader_enabled then
     disable_reader()
@@ -138,6 +144,7 @@ if not vim.g.markdown_reader_tab_autocmd then
   vim.api.nvim_create_autocmd({ "TabEnter", "TabNew" }, {
     group = reader_group,
     callback = function()
+      -- Leave reader mode when changing tabs so global UI options are restored.
       for _, win in ipairs(vim.api.nvim_list_wins()) do
         if vim.w[win].markdown_reader_enabled then
           vim.api.nvim_win_call(win, disable_reader)

@@ -1,4 +1,5 @@
 ---
+# Selene validates this configuration against Lua 5.1 with Neovim globals.
 base: lua51
 
 globals:

@@ -1,3 +1,4 @@
+-- Configure Mason's language server, tool, and debugger installers.
 return {
   {
     "mason-org/mason-lspconfig.nvim",

@@ -1,3 +1,4 @@
+-- Configure tmux navigation integration for Neovim splits.
 return {
   {
     "christoomey/vim-tmux-navigator",

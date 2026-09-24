@@ -1,3 +1,4 @@
+-- Show Git changes in the sign column and line-number highlights.
 return {
   {
     "lewis6991/gitsigns.nvim",

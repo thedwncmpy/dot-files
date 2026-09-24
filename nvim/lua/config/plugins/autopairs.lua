@@ -1,3 +1,4 @@
+-- Load automatic bracket pairing with the plugin's default settings.
 return {
   {
     "windwp/nvim-autopairs",

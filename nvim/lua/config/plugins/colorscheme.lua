@@ -1,3 +1,4 @@
+-- Configure and load the GitHub Dark theme with transparent sidebars and floats.
 return {
   {
     'projekt0n/github-nvim-theme',

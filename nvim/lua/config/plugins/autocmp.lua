@@ -1,3 +1,4 @@
+-- Configure completion sources, snippet expansion, and insert-mode navigation.
 return {
   "hrsh7th/nvim-cmp",
   event = "InsertEnter",
@@ -8,6 +9,7 @@ return {
     "rafamadriz/friendly-snippets", -- useful snippets
   },
   config = function()
+    -- Set up nvim-cmp and connect its snippet support to LuaSnip.
     local cmp = require "cmp"
 
     local luasnip = require "luasnip"
@@ -21,6 +23,7 @@ return {
       },
       mapping = cmp.mapping.preset.insert {
         ["<C-k>"] = cmp.mapping(function(fallback)
+          -- Prefer the previous completion item, then the prior snippet stop.
           if cmp.visible() then
             cmp.select_prev_item()
           elseif luasnip.locally_jumpable(-1) then
@@ -30,6 +33,7 @@ return {
           end
         end, { "i", "s" }),
         ["<C-j>"] = cmp.mapping(function(fallback)
+          -- Prefer the next completion item, then the next snippet stop.
           if cmp.visible() then
             cmp.select_next_item()
           elseif luasnip.locally_jumpable(1) then

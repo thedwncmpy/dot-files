@@ -1,9 +1,10 @@
+# Lua uses two-space indentation.
 [*.lua]
 indent_style = space
 indent_size = 2
 
+# JavaScript and TypeScript use two-space indentation.
 [*.ts, *.tsx, *.jsx]
 indent_style = space
 indent_size = 2
-
 

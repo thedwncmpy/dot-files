@@ -11,6 +11,7 @@ BREW_PREFIX="$(brew --prefix)"
 
 # Add a Homebrew tap only when it is missing.
 ensure_tap() {
+  # Add a Homebrew tap only if it is not already configured.
   local tap="$1"
   if ! brew tap | grep -qx "$tap"; then
     echo "Tapping $tap"
@@ -19,6 +20,7 @@ ensure_tap() {
 }
 
 install_formulae() {
+  # Install the command-line packages used by the dotfiles.
   local formulae=(
     neovim
     tmux
@@ -54,6 +56,7 @@ install_formulae() {
 }
 
 install_casks() {
+  # Install the GUI terminal and configured font.
   local casks=(
     ghostty
     font-lilex-nerd-font
@@ -128,6 +131,7 @@ MSG
 
 # Run full dependency setup in a predictable order.
 main() {
+  # Run dependency setup in order, then print the remaining manual steps.
   ensure_tap homebrew/cask-fonts
   brew update
   install_formulae

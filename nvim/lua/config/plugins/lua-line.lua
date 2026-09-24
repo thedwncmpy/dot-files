@@ -1,3 +1,4 @@
+-- Configure the statusline, mode colors, navigation breadcrumb, and tabline.
 return {
   {
     "nvim-lualine/lualine.nvim",
