@@ -15,6 +15,10 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   end
 end
 vim.opt.rtp:prepend(lazypath)
+local brew_prefix = vim.fn.trim(vim.fn.system("brew --prefix"))
+vim.opt.packpath:append(brew_prefix .. "/share/nvim/site")
+local markdown_todos_path = brew_prefix .. "/share/nvim/site/pack/homebrew/start/todo-markdown/lua"
+package.path = package.path .. ";" .. markdown_todos_path .. "/?.lua;" .. markdown_todos_path .. "/?/init.lua"
 
 -- Make sure to setup `mapleader` and `maplocalleader` before
 -- loading lazy.nvim so that mappings are correct.

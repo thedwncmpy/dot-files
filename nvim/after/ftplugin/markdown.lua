@@ -115,6 +115,32 @@ local function toggle_reader()
   end
 end
 
+-- Reader mode hides global UI elements, so it only makes sense while one
+-- named file buffer is open. Count all filetypes, not just Markdown buffers.
+local function open_file_buffer_count()
+  local count = 0
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_valid(buf)
+      and vim.bo[buf].buflisted
+      and vim.bo[buf].buftype == ""
+      and vim.api.nvim_buf_get_name(buf) ~= ""
+    then
+      count = count + 1
+    end
+  end
+  return count
+end
+
+local function leave_reader_when_multiple_files_open()
+  if open_file_buffer_count() < 2 then return end
+
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.w[win].markdown_reader_enabled then
+      vim.api.nvim_win_call(win, disable_reader)
+    end
+  end
+end
+
 vim.api.nvim_buf_create_user_command(0, "MarkdownReaderOn", enable_reader, {
   desc = "Enable a distraction-free Markdown reader layout",
 })
@@ -152,23 +178,20 @@ if not vim.g.markdown_reader_tab_autocmd then
       end
     end,
   })
+
 end
 
-local another_markdown_buffer_is_open = false
-for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-  if buf ~= vim.api.nvim_get_current_buf()
-    and vim.api.nvim_buf_is_valid(buf)
-    and vim.bo[buf].filetype == "markdown"
-    and vim.bo[buf].buftype == ""
-  then
-    another_markdown_buffer_is_open = true
-    break
-  end
+if not vim.g.markdown_reader_buffer_autocmd then
+  vim.g.markdown_reader_buffer_autocmd = true
+  vim.api.nvim_create_autocmd({ "BufAdd", "BufEnter" }, {
+    group = reader_group,
+    callback = leave_reader_when_multiple_files_open,
+  })
 end
 
 if vim.g.markdown_reader_auto ~= false
   and #vim.api.nvim_list_tabpages() == 1
-  and not another_markdown_buffer_is_open
+  and open_file_buffer_count() == 1
 then
   enable_reader()
 end
