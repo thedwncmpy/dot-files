@@ -1,3 +1,4 @@
+-- Configure Oil's file browser, mappings, image previews, and tmux integration.
 return {
   {
     "stevearc/oil.nvim",

@@ -1,5 +1,5 @@
-# Place a copy of this config to ~/.aerospace.toml
-# After that, you can edit ~/.aerospace.toml to your liking
+# AeroSpace window manager configuration.
+# Sections below cover startup behavior, layout defaults, gaps, and bindings.
 
 # You can use it to add commands that run after login to macOS user session.
 # 'start-at-login' needs to be 'true' for 'after-login-command' to work
@@ -11,13 +11,8 @@ after-login-command = []
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = []
 
-# Notify Sketchybar about workspace change
+# Optional command hook for workspace changes.
 exec-on-workspace-change = []
-
-
-# Notify Sketchybar when new windows are detected
-
-  # Notify Sketchybar when windows are opened, closed, or moved
 # Start AeroSpace at login
 start-at-login = true
 
@@ -157,6 +152,7 @@ run = 'move-node-to-workspace 3'
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 [mode.service.binding]
+    # Reset layout, toggle floating mode, and close neighboring windows.
     q = ['reload-config', 'mode main']
     r = ['flatten-workspace-tree', 'mode main'] # reset layout
     f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout

@@ -1,3 +1,4 @@
+-- Configure rendered Markdown headings, checkboxes, and tables.
 return {
   {
     "MeanderingProgrammer/render-markdown.nvim",

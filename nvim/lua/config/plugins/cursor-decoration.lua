@@ -1,3 +1,4 @@
+-- Tune the Smear Cursor animation for normal and insert modes.
 return {
   "sphamba/smear-cursor.nvim",
   opts = {                                  -- Default  Range

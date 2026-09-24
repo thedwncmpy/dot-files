@@ -1,3 +1,4 @@
+-- Set shared LSP capabilities, per-server settings, and enabled servers.
 return {
   "hrsh7th/cmp-nvim-lsp",
   event = { "BufReadPre", "BufNewFile" },

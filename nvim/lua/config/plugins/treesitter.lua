@@ -1,3 +1,4 @@
+-- Configure Tree-sitter parsers, highlighting, and language-specific features.
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -12,6 +13,7 @@ return {
         highlight = {
           enable = true,
           disable = function(lang, buf)
+            -- Skip shell highlights and large files that can slow parsing.
             local ft = vim.bo[buf].filetype
             if ft == "zsh" then return true end
             if lang == "zsh" then return true end

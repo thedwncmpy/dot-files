@@ -1,3 +1,4 @@
+-- Bootstrap lazy.nvim, load plugin specs, and set core editor options.
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -72,21 +73,25 @@ vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldlevel = 99
 
+-- Remove ANSI color sequences before showing command output in Neovim.
 local function strip_ansi(s) return s:gsub("\27%[[0-9;]*m", "") end
 
 vim.api.nvim_create_autocmd("BufWritePost", {
   pattern = "*.md",
   callback = function(args)
+    -- Upload the saved Markdown file and display any command output.
     vim.fn.jobstart({ "ns", "watch-upload", args.file }, {
       stdout_buffered = true,
       stderr_buffered = true,
       on_stdout = function(_, data)
+        -- Display non-empty standard output as informational messages.
         for _, line in ipairs(data or {}) do
           line = strip_ansi(line)
           if line ~= "" then vim.schedule(function() vim.api.nvim_echo({ { line, "None" } }, false, {}) end) end
         end
       end,
       on_stderr = function(_, data)
+        -- Display non-empty error output with warning highlighting.
         for _, line in ipairs(data or {}) do
           line = strip_ansi(line)
           if line ~= "" then vim.schedule(function() vim.api.nvim_echo({ { line, "WarningMsg" } }, false, {}) end) end

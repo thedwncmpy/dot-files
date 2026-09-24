@@ -1,6 +1,7 @@
 -- Custom Nvim greeting page
 -- Add this to your init.lua or in a separate file that you source
 
+-- Return the lines displayed on the startup greeting screen.
 local function custom_intro()
   local version = vim.version()
   local nvim_version = string.format("NVIM v%d.%d.%d", version.major, version.minor, version.patch)
@@ -30,6 +31,7 @@ end
 -- Set up autocommand to show custom intro in floating window
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
+    -- Display the greeting only when Neovim starts without file arguments.
     -- Only show on startup with no files
     if vim.fn.argc() == 0 and vim.fn.line2byte("$") == -1 then
       local buf = vim.api.nvim_create_buf(false, true)
@@ -93,12 +95,14 @@ vim.api.nvim_create_autocmd("VimEnter", {
 
       -- Close floating window on any key press or buffer change
       vim.keymap.set("n", "<Esc>", function()
+        -- Close the greeting when Escape is pressed.
         if vim.api.nvim_win_is_valid(win) then
           vim.api.nvim_win_close(win, true)
         end
       end, { buffer = buf, nowait = true })
 
       vim.keymap.set("n", "<CR>", function()
+        -- Close the greeting when Enter is pressed.
         if vim.api.nvim_win_is_valid(win) then
           vim.api.nvim_win_close(win, true)
         end
@@ -108,6 +112,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
       vim.api.nvim_create_autocmd({ "InsertEnter", "BufLeave", "BufNew" }, {
         buffer = buf,
         callback = function()
+          -- Close the greeting before switching to another editing context.
           if vim.api.nvim_win_is_valid(win) then
             vim.api.nvim_win_close(win, true)
           end

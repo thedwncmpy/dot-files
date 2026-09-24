@@ -1,3 +1,4 @@
+-- Configure formatters, Markdown formatting opt-in, and format-and-save keys.
 return {
   "stevearc/conform.nvim",
   event = { "BufReadPre", "BufNewFile" },
@@ -5,6 +6,7 @@ return {
     local conform = require "conform"
 
     local function markdown_format_enabled(bufnr)
+      -- Markdown formatting stays off unless this buffer explicitly enables it.
       return vim.bo[bufnr].filetype ~= "markdown" or vim.b[bufnr].markdown_format_enabled == true
     end
 
@@ -27,6 +29,7 @@ return {
         python = { "isort", "black" },
       },
       format_on_save = function(bufnr)
+        -- Skip automatic formatting for Markdown unless opted in per buffer.
         if not markdown_format_enabled(bufnr) then return nil end
         return {
           lsp_fallback = true,
@@ -37,6 +40,7 @@ return {
     }
 
     vim.api.nvim_create_user_command("MarkdownFormatToggle", function()
+      -- Flip this buffer's Markdown formatting preference and report the state.
       vim.b.markdown_format_enabled = not vim.b.markdown_format_enabled
       local state = vim.b.markdown_format_enabled and "enabled" or "disabled"
       vim.notify("Markdown formatting " .. state .. " for this buffer")
@@ -45,6 +49,7 @@ return {
     vim.keymap.set("n", "<leader>mf", "<cmd>MarkdownFormatToggle<CR>", { desc = "Toggle Markdown formatting" })
 
     vim.keymap.set({ "n", "v", "i" }, "<C-s>", function()
+      -- Format the current buffer or selection, then save it.
       -- If in Insert mode, escape to Normal mode first
       if vim.api.nvim_get_mode().mode == "i" then
         vim.cmd "stopinsert" -- This is equivalent to pressing <Esc>

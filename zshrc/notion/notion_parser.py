@@ -4,7 +4,7 @@ import re
 
 def parse_inline_text(text):
     """
-    Parses bold and italics in a string and returns Notion rich_text objects.
+    Convert supported Markdown emphasis into Notion rich-text objects.
     """
     parts = []
     remaining = text
@@ -52,7 +52,7 @@ def parse_inline_text(text):
 
 def rich_text_to_md(rich_text_list):
     """
-    Converts Notion rich_text objects back to Markdown string.
+    Convert Notion rich-text objects into a Markdown string.
     """
     md = ""
     for rt in rich_text_list:
@@ -70,6 +70,7 @@ def rich_text_to_md(rich_text_list):
     return md
 
 def md_to_notion_blocks(md_text):
+    """Convert supported Markdown lines into Notion block objects."""
     blocks = []
     lines = md_text.splitlines()
     
@@ -163,7 +164,7 @@ def md_to_notion_blocks(md_text):
 
 def notion_blocks_to_md(blocks):
     """
-    Converts Notion block objects back to Markdown string with improved spacing.
+    Convert Notion blocks into Markdown, separating distinct block types.
     """
     md_lines = []
     prev_type = None

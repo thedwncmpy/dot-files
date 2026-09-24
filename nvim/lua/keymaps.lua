@@ -1,6 +1,7 @@
 -- ========================================================================== --
 --                                  KEYMAPS                                   --
 -- ========================================================================== --
+-- Define editor navigation, buffer, window, text movement, and diagnostic keys.
 
 -- SOURCE / EXECUTE
 vim.keymap.set("n", "<space><space>x", "<cmd>source %<CR>", { desc = "Source current file" })
@@ -37,12 +38,14 @@ vim.keymap.set("v", "<leader>k", ":m '<-2<CR>gv=gv", { silent = true, desc = "Mo
 vim.keymap.set(
   "s",
   "<C-j>",
+  -- Jump to the next LuaSnip placeholder.
   function() require("luasnip").jump(1) end,
   { silent = true, desc = "Jump forward (Luasnip)" }
 )
 vim.keymap.set(
   "s",
   "<C-k>",
+  -- Jump to the previous LuaSnip placeholder.
   function() require("luasnip").jump(-1) end,
   { silent = true, desc = "Jump backward (Luasnip)" }
 )
@@ -56,6 +59,7 @@ vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open diagn
 vim.keymap.set(
   "n",
   "<leader>d",
+  -- Populate quickfix with diagnostics from all listed buffers.
   function() vim.diagnostic.setqflist() end,
   { desc = "Set quickfix list with diagnostics" }
 )

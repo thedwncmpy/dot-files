@@ -1,3 +1,4 @@
+-- Load LazyGit on demand through its commands or the configured keymap.
 return {
   "kdheepak/lazygit.nvim",
   lazy = true,

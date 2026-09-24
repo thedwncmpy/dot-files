@@ -1,3 +1,4 @@
+-- Enable mini.statusline with icon support.
 return {
   {
     "echasnovski/mini.nvim",

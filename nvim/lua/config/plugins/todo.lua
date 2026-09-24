@@ -1,3 +1,4 @@
+-- Configure TODO comment highlighting and navigation.
 return {
   {
     "folke/todo-comments.nvim",
@@ -13,6 +14,7 @@ return {
       {
         "]t",
         function()
+          -- Move to the next TODO comment.
           require("todo-comments").jump_next()
         end,
         desc = "Next todo comment",
@@ -20,6 +22,7 @@ return {
       {
         "[t",
         function()
+          -- Move to the previous TODO comment.
           require("todo-comments").jump_prev()
         end,
         desc = "Previous todo comment",

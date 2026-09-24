@@ -1,14 +1,18 @@
+-- Configure Telescope pickers and compatibility handling for LSP position params.
 return {
   "nvim-telescope/telescope.nvim",
   -- master branch often has better support for Neovim Nightly (0.11)
   -- branch = "0.1.x",
   dependencies = { "nvim-lua/plenary.nvim", { "nvim-telescope/telescope-fzf-native.nvim", build = "make" } },
   config = function()
+    -- Patch position-parameter defaults for clients using differing LSP encodings.
     if not vim.g._lsp_make_position_params_patched then
       local original_make_position_params = vim.lsp.util.make_position_params
       vim.lsp.util.make_position_params = function(window, position_encoding)
+        -- Infer the encoding from the LSP client attached to the target buffer.
         if position_encoding == nil then
           local ok, bufnr = pcall(function()
+            -- Resolve the requested window's buffer, falling back to the current buffer.
             if window then
               return vim.api.nvim_win_get_buf(window)
             end
@@ -70,6 +74,7 @@ return {
     require("config.telescope.multigrep").setup()
     local builtin = require "telescope.builtin"
     local function lsp_position_encoding(bufnr)
+      -- Return the first attached client's encoding, or LSP's utf-16 default.
       local clients = vim.lsp.get_clients { bufnr = bufnr }
       if clients[1] then
         return clients[1].offset_encoding or clients[1].position_encoding
@@ -78,6 +83,7 @@ return {
     end
     -- Narrow the symbol picker to callable members for quick code navigation.
     local function list_document_functions()
+      -- Open a document-symbol picker limited to functions and methods.
       local bufnr = vim.api.nvim_get_current_buf()
       if vim.tbl_isempty(vim.lsp.get_clients { bufnr = bufnr }) then
         vim.notify("No active LSP client for current buffer", vim.log.levels.WARN)

@@ -1,3 +1,4 @@
+-- Register nvim-surround's default text-object and surround mappings.
 return {
   {
     "kylechui/nvim-surround",

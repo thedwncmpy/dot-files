@@ -1,3 +1,4 @@
+-- Configure buffer tabs and their transparent highlight groups.
 return {
   {
     "akinsho/bufferline.nvim",
