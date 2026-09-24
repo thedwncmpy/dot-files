@@ -17,7 +17,8 @@ tmux manages persistent terminal sessions, windows, and panes. The config uses
 clipboard integration, and focus events for Neovim. New sessions automatically
 create `editor`, `ai`, and `server` windows.
 
-Press `C-a s` to open a standalone floating session manager. `j`/`k` navigate;
+Press `C-a s` to save the tmux session with tmux-resurrect, or `C-a C-s` to open
+the standalone floating session manager. `j`/`k` navigate;
 `J`/`K` move a row, or move a selected block after `v`. `dd` cuts a row and
 `p`/`P` pastes it; `e` renames, `a` adds, and `u` undoes. `Ctrl-S` saves the
 order and renumbers rows from 1, including renames, additions, and confirmed
