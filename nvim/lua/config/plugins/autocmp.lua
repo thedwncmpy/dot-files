@@ -11,6 +11,8 @@ return {
   config = function()
     -- Set up nvim-cmp and connect its snippet support to LuaSnip.
     local cmp = require "cmp"
+    -- Use the nvim-cmp source supplied by the Homebrew todo-markdown package.
+    cmp.register_source("markdown_todos", require "telescope._extensions.markdown_todos.cmp_source")
 
     local luasnip = require "luasnip"
 
@@ -46,15 +48,26 @@ return {
         ["<C-f>"] = cmp.mapping.scroll_docs(4),
         ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
         ["<C-e>"] = cmp.mapping.abort(), -- close completion window
-        ["<CR>"] = cmp.mapping.confirm { select = false },
+        ["<CR>"] = cmp.mapping.confirm { select = true },
+      },
+      formatting = {
+        format = function(entry, item)
+          -- Mark todo categories so they are distinguishable from buffer words.
+          if entry.source.name == "markdown_todos" then item.menu = "[todos]" end
+          return item
+        end,
       },
       -- sources for autocompletion
-      sources = cmp.config.sources {
-        { name = "nvim_lsp" },
-        { name = "luasnip" }, -- snippets
-        { name = "buffer" }, -- text within current buffer
-        { name = "path" }, -- file system paths
-      },
+      -- Prefer task category completions; use normal sources when no category matches.
+      sources = cmp.config.sources(
+        { { name = "markdown_todos" } },
+        {
+          { name = "nvim_lsp" },
+          { name = "luasnip" }, -- snippets
+          { name = "buffer" }, -- text within current buffer
+          { name = "path" }, -- file system paths
+        }
+      ),
     }
   end,
 }

@@ -19,11 +19,6 @@ return {
           enabled = true,
         },
       },
-      checkbox = {
-        checked = {
-          scope_highlight = "@markup.strikethrough",
-        },
-      },
       pipe_table = {
         preset = "round",
       },
