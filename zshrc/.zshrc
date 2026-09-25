@@ -58,6 +58,15 @@ source $ZSH/oh-my-zsh.sh
 eval "$(zoxide init zsh)"
 eval "$(pyenv init - zsh)"
 eval "$(codex completion zsh)"
+
+# Disable Codex alternate screen inside tmux to preserve scrollback.
+function codex() {
+  if [[ -n "$TMUX" ]]; then
+    command codex --no-alt-screen "$@"
+  else
+    command codex "$@"
+  fi
+}
 eval "$(ns completion zsh)"
 source <(fzf --zsh)
 
@@ -131,11 +140,11 @@ _codex_right_pane() {
 }
 
 codex-right() {
-  _codex_right_pane 'codex'
+  _codex_right_pane 'codex --no-alt-screen'
 }
 
 codex-resume-right() {
-  _codex_right_pane 'codex resume'
+  _codex_right_pane 'codex --no-alt-screen resume'
 }
 
 alias air='codex-resume-right'
