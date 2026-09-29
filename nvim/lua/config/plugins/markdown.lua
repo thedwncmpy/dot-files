@@ -7,8 +7,8 @@ return {
     ---@type render.md.UserConfig
     opts = {
       heading = {
-        -- 'block' width often fixes highlight spillover into the gutter/sign column
-        width = "block",
+        -- Use the full window width to avoid clipping heading text in reader mode.
+        width = "full",
         -- 'inline' position can help with rendering consistency during anti-conceal transitions
         position = "inline",
         -- Disable signs in the gutter

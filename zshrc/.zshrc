@@ -12,6 +12,9 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export ZSH="$HOME/.oh-my-zsh"
 export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$HOME/dev/todo-markdown:$PATH"
+
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 
 # Ensure PATH entries are unique
 typeset -U path PATH
@@ -77,6 +80,7 @@ source <(fzf --zsh)
 # 5. ALIASES
 # ==========================================
 # General & Navigation
+alias sz='source ~/.zshrc'
 alias c='clear'
 alias vs='code .'
 alias cd='z'
@@ -122,10 +126,13 @@ alias tsc='tmux switch-client -t'
 #AI
 alias ask="gemini -p"
 
-# Open Codex in a right-hand tmux pane. `ai` starts a fresh session; `air`
-# opens Codex's saved-session picker.
+# `ai` focuses a busy right-hand Codex pane, or starts a fresh session.
+# `air` reuses an existing pane, or opens Codex's saved-session picker.
 _codex_right_pane() {
   local codex_command="$1"
+  local reuse_idle="${2:-false}"
+  local target pane_id pane_command pane_left pane_title pane_start
+  local codex_pane idle_pane pane_screen
 
   if ! command -v tmux >/dev/null 2>&1; then
     print -u2 "Codex pane: tmux is not installed"
@@ -133,9 +140,44 @@ _codex_right_pane() {
   fi
 
   if [[ -n "$TMUX" ]]; then
-    tmux split-window -h -c "$PWD" "$codex_command"
+    target="${TMUX_PANE:-}"
   else
-    tmux new-session -A -s main -c "$PWD" \; split-window -h -c "$PWD" "$codex_command"
+    tmux new-session -Ad -s main -c "$PWD" || return
+    target='main:'
+  fi
+
+  while IFS=$'\t' read -r pane_id pane_command pane_left pane_title pane_start; do
+    (( pane_left > 0 )) || continue
+    # Some Codex installations run through a Node launcher.
+    [[ "$pane_command" == codex ||
+       ( "$pane_command" == node && "$pane_start" == *codex* ) ]] || continue
+
+    [[ -n "$idle_pane" ]] || idle_pane="$pane_id"
+    # Codex prefixes the terminal title with a braille spinner while working.
+    if [[ "$pane_title" == [⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]* ]]; then
+      codex_pane="$pane_id"
+      break
+    fi
+    # Also handle sessions without terminal-title activity enabled.
+    pane_screen="$(tmux capture-pane -p -t "$pane_id" 2>/dev/null)"
+    if [[ "$pane_screen" == *'esc to interrupt'* ]]; then
+      codex_pane="$pane_id"
+      break
+    fi
+  done < <(tmux list-panes -t "$target" -F $'#{pane_id}\t#{pane_current_command}\t#{pane_left}\t#{pane_title}\t#{pane_start_command}')
+
+  if [[ -z "$codex_pane" && "$reuse_idle" == true ]]; then
+    codex_pane="$idle_pane"
+  fi
+
+  if [[ -n "$codex_pane" ]]; then
+    tmux select-pane -t "$codex_pane" || return
+  else
+    tmux split-window -h -t "$target" -c "$PWD" "$codex_command" || return
+  fi
+
+  if [[ -z "$TMUX" ]]; then
+    tmux attach-session -t main
   fi
 }
 
@@ -144,7 +186,7 @@ codex-right() {
 }
 
 codex-resume-right() {
-  _codex_right_pane 'codex --no-alt-screen resume'
+  _codex_right_pane 'codex --no-alt-screen resume' true
 }
 
 alias air='codex-resume-right'
@@ -243,3 +285,6 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
+
+# Session list outside tmux; session picker inside tmux.
+alias tsessions='if [ -n "${TMUX:-}" ]; then tmux display-popup -E -w 75% -h 70% -T '"'"' Sessions '"'"' '"'"'if command -v tmux-oil >/dev/null 2>&1; then exec tmux-oil; else exec python3 ~/.config/tmux-oil/bin/tmux-oil; fi'"'"'; else tls; fi'

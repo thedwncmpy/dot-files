@@ -11,7 +11,7 @@ return {
   config = function()
     -- Set up nvim-cmp and connect its snippet support to LuaSnip.
     local cmp = require "cmp"
-    -- Use the nvim-cmp source supplied by the Homebrew todo-markdown package.
+    -- Use the nvim-cmp source supplied by the local todo-markdown plugin.
     cmp.register_source("markdown_todos", require "telescope._extensions.markdown_todos.cmp_source")
 
     local luasnip = require "luasnip"
