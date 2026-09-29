@@ -1,1 +1,0 @@
-/Users/edwinolivares/notes/project/notion-cli.md
