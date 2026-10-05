@@ -8,3 +8,5 @@ ns-cli/secrets.zsh
 
 tmux/session-order.json
 tmux-oil/
+aerospace-menu-bar/.build/
+aerospace-menu-bar/dist/

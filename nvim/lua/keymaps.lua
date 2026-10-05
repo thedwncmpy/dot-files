@@ -28,6 +28,39 @@ vim.keymap.set("n", "<M-l>", ":bnext<CR>", { noremap = true, silent = true, desc
 -- WINDOWS & QUITTING
 vim.keymap.set("n", "<leader>q", ":qa<CR>", { desc = "Quit all" })
 
+-- Keep one Codex terminal per tab so hiding the split preserves its session.
+local codex_splits = {}
+local function toggle_codex_split()
+  local tab = vim.api.nvim_get_current_tabpage()
+  local split = codex_splits[tab]
+  if split and vim.api.nvim_win_is_valid(split.win) then
+    vim.api.nvim_win_close(split.win, true)
+    return
+  end
+
+  local running = split and vim.api.nvim_buf_is_valid(split.buf) and vim.fn.jobwait({ split.job }, 0)[1] == -1
+  if not running and vim.fn.executable("codex") ~= 1 then
+    vim.notify("codex executable not found", vim.log.levels.ERROR)
+    return
+  end
+
+  vim.cmd "botright vsplit"
+  local win = vim.api.nvim_get_current_win()
+  if running then
+    vim.api.nvim_win_set_buf(win, split.buf)
+    split.win = win
+  else
+    if split and vim.api.nvim_buf_is_valid(split.buf) then vim.api.nvim_buf_delete(split.buf, { force = true }) end
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.bo[buf].bufhidden = "hide"
+    vim.api.nvim_win_set_buf(win, buf)
+    local job = vim.fn.termopen { "codex" }
+    codex_splits[tab] = { buf = buf, win = win, job = job }
+  end
+  vim.cmd "startinsert"
+end
+vim.keymap.set("n", "<leader>ai", toggle_codex_split, { desc = "Toggle Codex split" })
+
 -- MOVING TEXT (Visual Mode)
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move block down" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move block up" })

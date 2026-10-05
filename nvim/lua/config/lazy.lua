@@ -40,7 +40,10 @@ vim.opt.tabstop = 2 -- Number of spaces tabs count for
 vim.opt.softtabstop = 2 -- Number of spaces tabs count for while editing
 vim.opt.clipboard = "unnamedplus"
 
-if vim.env.SSH_CONNECTION then
+-- Share the + register across Neovim instances on the same tmux server.
+if vim.env.TMUX then
+  vim.g.clipboard = "tmux"
+elseif vim.env.SSH_CONNECTION then
   vim.g.clipboard = {
     name = "OSC 52",
     copy = {

@@ -72,7 +72,7 @@ return {
     tele.load_extension "fzf"
     tele.load_extension "markdown_todos"
     vim.keymap.set("n", "<leader>mt", function()
-      require("telescope._extensions.markdown_todos.init").todo()
+      require("telescope._extensions.markdown_todos.list_view").open()
     end, { desc = "Find Markdown todos" })
 
     require("config.telescope.multigrep").setup()

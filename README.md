@@ -2,6 +2,12 @@
 
 this repository contains terminal-first development configuration for Ghostty, tmux, zsh, and Neovim.
 
+## AeroSpace menu bar
+
+`aerospace-menu-bar/` contains a native macOS menu bar app that shows AeroSpace
+workspaces and their app icons on one display. See its [README](aerospace-menu-bar/README.md)
+for build and launch instructions.
+
 ## Ghostty
 
 Configured in `ghostty/config`.
