@@ -40,9 +40,9 @@ final class WorkspaceSnapshotTests: XCTestCase {
         XCTAssertNil(groups[0].focusedAppBundleID)
     }
 
-    func testVisibleAppsFollowHorizontalLayoutAndInactiveAppsKeepLastOrder() throws {
+    func testVisibleTiledAppsFollowHorizontalLayoutAndInactiveAppsKeepLastOrder() throws {
         let workspaces = try JSONDecoder().decode([Workspace].self, from: Data("""
-        [{"workspace":"1","workspace-is-focused":true,"workspace-root-container-layout":"h_accordion"},
+        [{"workspace":"1","workspace-is-focused":true,"workspace-root-container-layout":"h_tiles"},
          {"workspace":"2","workspace-is-focused":false,"workspace-root-container-layout":"v_tiles"}]
         """.utf8))
         let windows = try JSONDecoder().decode([Window].self, from: Data("""
@@ -80,5 +80,62 @@ final class WorkspaceSnapshotTests: XCTestCase {
             previousAppOrder: [:]
         )
         XCTAssertEqual(groups[0].apps.map(\.bundleID), ["b", "a"])
+    }
+
+    func testMissingFrameKeepsPreviousOrderForWholeWorkspace() throws {
+        let workspace = try JSONDecoder().decode(Workspace.self, from: Data("""
+        {"workspace":"1","workspace-is-focused":true,"workspace-root-container-layout":"h_tiles"}
+        """.utf8))
+        let windows = try JSONDecoder().decode([Window].self, from: Data("""
+        [{"window-id":1,"workspace":"1","app-bundle-id":"a","app-name":"A"},
+         {"window-id":2,"workspace":"1","app-bundle-id":"b","app-name":"B"},
+         {"window-id":3,"workspace":"1","app-bundle-id":"c","app-name":"C"}]
+        """.utf8))
+        let groups = WorkspaceSnapshot.groups(
+            workspaces: [workspace], windows: windows, focusedWindow: nil,
+            frames: [1: CGRect(x: 200, y: 0, width: 100, height: 100),
+                     3: CGRect(x: 0, y: 0, width: 100, height: 100)],
+            previousAppOrder: ["1": ["a", "b", "c"]]
+        )
+        XCTAssertEqual(groups[0].apps.map(\.bundleID), ["a", "b", "c"])
+    }
+
+    func testAccordionPositionChangesUpdateCandidateOrder() throws {
+        let workspace = try JSONDecoder().decode(Workspace.self, from: Data("""
+        {"workspace":"1","workspace-is-focused":true,"workspace-root-container-layout":"h_accordion"}
+        """.utf8))
+        let windows = try JSONDecoder().decode([Window].self, from: Data("""
+        [{"window-id":1,"workspace":"1","app-bundle-id":"a","app-name":"A"},
+         {"window-id":2,"workspace":"1","app-bundle-id":"b","app-name":"B"},
+         {"window-id":3,"workspace":"1","app-bundle-id":"c","app-name":"C"}]
+        """.utf8))
+        let groups = WorkspaceSnapshot.groups(
+            workspaces: [workspace], windows: windows, focusedWindow: windows[2],
+            frames: [1: CGRect(x: 200, y: 0, width: 100, height: 100),
+                     2: CGRect(x: 100, y: 0, width: 100, height: 100),
+                     3: CGRect(x: 0, y: 0, width: 100, height: 100)],
+            previousAppOrder: ["1": ["a", "b", "c"]]
+        )
+        XCTAssertEqual(groups[0].apps.map(\.bundleID), ["c", "b", "a"])
+        XCTAssertEqual(groups[0].focusedAppBundleID, "c")
+    }
+
+    func testAccordionStartsWithVisiblePositionOrder() throws {
+        let workspace = try JSONDecoder().decode(Workspace.self, from: Data("""
+        {"workspace":"1","workspace-is-focused":true,"workspace-root-container-layout":"h_accordion"}
+        """.utf8))
+        let windows = try JSONDecoder().decode([Window].self, from: Data("""
+        [{"window-id":1,"workspace":"1","app-bundle-id":"a","app-name":"A"},
+         {"window-id":2,"workspace":"1","app-bundle-id":"b","app-name":"B"},
+         {"window-id":3,"workspace":"1","app-bundle-id":"c","app-name":"C"}]
+        """.utf8))
+        let groups = WorkspaceSnapshot.groups(
+            workspaces: [workspace], windows: windows, focusedWindow: windows[0],
+            frames: [1: CGRect(x: 200, y: 0, width: 100, height: 100),
+                     2: CGRect(x: 100, y: 0, width: 100, height: 100),
+                     3: CGRect(x: 0, y: 0, width: 100, height: 100)],
+            previousAppOrder: [:]
+        )
+        XCTAssertEqual(groups[0].apps.map(\.bundleID), ["c", "b", "a"])
     }
 }

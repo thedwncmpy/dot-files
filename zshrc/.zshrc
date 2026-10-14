@@ -12,6 +12,7 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export ZSH="$HOME/.oh-my-zsh"
 export PYENV_ROOT="$HOME/.pyenv"
+export NVM_DIR="$HOME/.nvm"
 export PATH="$HOME/dev/todo-markdown:$PATH"
 
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
@@ -25,6 +26,13 @@ path=(
   "$PYENV_ROOT/bin"
   $path
 )
+
+# Load Homebrew's nvm installation when available.
+if command -v brew >/dev/null 2>&1; then
+  NVM_BREW_DIR="$(brew --prefix nvm 2>/dev/null)"
+  [[ -s "$NVM_BREW_DIR/nvm.sh" ]] && source "$NVM_BREW_DIR/nvm.sh"
+  [[ -s "$NVM_BREW_DIR/etc/bash_completion.d/nvm" ]] && source "$NVM_BREW_DIR/etc/bash_completion.d/nvm"
+fi
 
 export EDITOR=$(command -v nvim || echo "vi")
 export VISUAL=$(command -v nvim || echo "vi")

@@ -44,8 +44,16 @@ enum WorkspaceSnapshot {
         workspaces.map { workspace in
             let previousRanks = Dictionary(uniqueKeysWithValues:
                 (previousAppOrder[workspace.name] ?? []).enumerated().map { ($0.element, $0.offset) })
-            let orderedWindows = windows.filter { $0.workspace == workspace.name }.sorted { lhs, rhs in
-                if workspace.isFocused {
+            let workspaceWindows = windows.filter { $0.workspace == workspace.name }
+            // A focus transition can temporarily leave some windows out of the
+            // Core Graphics list. Mixing frame and saved-order comparisons in
+            // one sort can produce an inconsistent ordering.
+            let hasAllFrames = workspaceWindows.allSatisfy { frames[$0.id] != nil }
+            // Re-read the visible layout on every refresh, including accordions.
+            // The stabilizer confirms a changed order before displaying it.
+            let useFrameOrder = workspace.isFocused && hasAllFrames
+            let orderedWindows = workspaceWindows.sorted { lhs, rhs in
+                if useFrameOrder {
                     let left = frames[lhs.id]
                     let right = frames[rhs.id]
                     if let left, let right {
@@ -56,8 +64,6 @@ enum WorkspaceSnapshot {
                         let leftSecondary = vertical ? left.minX : left.minY
                         let rightSecondary = vertical ? right.minX : right.minY
                         if leftSecondary != rightSecondary { return leftSecondary < rightSecondary }
-                    } else if left != nil || right != nil {
-                        return left != nil
                     }
                 }
                 let leftRank = previousRanks[lhs.bundleID] ?? Int.max

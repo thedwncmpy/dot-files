@@ -7,8 +7,6 @@ if ! command -v brew >/dev/null 2>&1; then
   exit 1
 fi
 
-BREW_PREFIX="$(brew --prefix)"
-
 # Add a Homebrew tap only when it is missing.
 ensure_tap() {
   # Add a Homebrew tap only if it is not already configured.
@@ -26,6 +24,7 @@ install_formulae() {
     tmux
     tpm
     git
+    node
     ripgrep
     fd
     fzf
@@ -35,11 +34,13 @@ install_formulae() {
     pyenv
     nvm
     pnpm
+    gemini-cli
     lazygit
     lua-language-server
     stylua
-    prettierd
+    prettier
     eslint_d
+    shfmt
     black
     isort
     pylint
@@ -56,10 +57,12 @@ install_formulae() {
 }
 
 install_casks() {
-  # Install the GUI terminal and configured font.
+  # Install GUI apps and fonts used by the configuration.
   local casks=(
     ghostty
     font-lilex-nerd-font
+    nikitabobko/tap/aerospace
+    codex
   )
 
   for cask in "${casks[@]}"; do
@@ -70,6 +73,23 @@ install_casks() {
       brew install --cask "$cask"
     fi
   done
+}
+
+install_local_formula() {
+  local formula="$1"
+  local package="$2"
+
+  if [[ ! -f "$formula" ]]; then
+    echo "[skip] $package formula not found at $formula"
+    return
+  fi
+
+  if brew list --formula "$package" >/dev/null 2>&1; then
+    echo "[ok] $package already installed"
+  else
+    echo "Installing $package from $formula"
+    brew install "$formula"
+  fi
 }
 
 # Install Oh My Zsh plus theme/plugins used by this config.
@@ -123,19 +143,22 @@ Done. Next steps:
 1. Symlink your config files into place if you haven't already.
 2. Start tmux and install TPM plugins with: prefix + I
 3. Run nvim once so lazy.nvim/mason can finish plugin and LSP setup.
-4. Restart your shell to pick up zsh changes.
+4. Restart your shell, then install a Node.js LTS version with: nvm install --lts
 
-Note: this script does not install Codex or Gemini CLIs.
+Note: install the local CLI repositories under ~/dev before running this script if they are missing.
 MSG
 }
 
 # Run full dependency setup in a predictable order.
 main() {
   # Run dependency setup in order, then print the remaining manual steps.
-  ensure_tap homebrew/cask-fonts
+  ensure_tap nikitabobko/tap
   brew update
   install_formulae
+  install_local_formula "$HOME/dev/ns-cli/Formula/ns.rb" ns
+  install_local_formula "$HOME/dev/tmux-oil/Formula/tmux-oil.rb" tmux-oil
   install_casks
+  mkdir -p "$HOME/.nvm"
   install_oh_my_zsh_stack
   print_follow_up
 }

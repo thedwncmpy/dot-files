@@ -9,7 +9,9 @@ The underline and dot glide to their new positions when focus or layout changes.
 Focus changes update from AeroSpace events; the app also polls every two seconds
 for layout changes.
 
-App icons follow their window positions in the visible workspace. The app keeps
+App icons follow their window positions in a visible tiled workspace, including
+accordion layouts. A changed order is confirmed on the next refresh to avoid
+briefly rearranging icons during a focus transition. The app keeps
 the last observed order for each workspace after you switch away from it. Before
 a workspace has been shown, its icons use app-name order because AeroSpace does
 not expose the layout order of hidden workspaces.

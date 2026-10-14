@@ -76,6 +76,8 @@ private final class MenuBarApp: NSObject, NSApplicationDelegate, NSMenuDelegate 
     private var refreshPending = false
     private var events: AeroSpaceEvents?
     private var currentGroups: [WorkspaceGroup] = []
+    private var appOrder = AppOrderStabilizer()
+    private var orderCheck: Timer?
     private var currentLayout: StatusLayout?
     private var lastError: String?
     private var icons: [String: NSImage] = [:]
@@ -99,6 +101,7 @@ private final class MenuBarApp: NSObject, NSApplicationDelegate, NSMenuDelegate 
 
     func applicationWillTerminate(_ notification: Notification) {
         animationTimer?.invalidate()
+        orderCheck?.invalidate()
         timer?.invalidate()
         events?.stop()
     }
@@ -109,20 +112,24 @@ private final class MenuBarApp: NSObject, NSApplicationDelegate, NSMenuDelegate 
             return
         }
         isRefreshing = true
-        let previousAppOrder = Dictionary(uniqueKeysWithValues: currentGroups.map {
-            ($0.workspace.name, $0.apps.map(\.bundleID))
-        })
+        let previousAppOrder = appOrder.acceptedOrders
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
             let result = Result { try self.client.snapshot(previousAppOrder: previousAppOrder) }
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [self] in
                 self.isRefreshing = false
                 switch result {
                 case .success(let groups):
-                    self.currentGroups = groups
-                    self.currentLayout = StatusLayout(groups: groups)
+                    self.currentGroups = self.appOrder.update(groups)
+                    self.currentLayout = StatusLayout(groups: self.currentGroups)
                     self.lastError = nil
                     self.animateIndicators()
+                    self.orderCheck?.invalidate()
+                    if self.appOrder.hasPendingChange {
+                        self.orderCheck = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: false) { [weak self] _ in
+                            self?.refresh()
+                        }
+                    }
                 case .failure(let error):
                     self.lastError = error.localizedDescription
                     self.render()
