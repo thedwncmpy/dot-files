@@ -24,6 +24,16 @@ private struct IndicatorPositions: Equatable {
     }
 }
 
+private struct IndicatorVelocities {
+    var workspace: Indicator
+    var app: Indicator
+
+    static let zero = IndicatorVelocities(
+        workspace: Indicator(x: 0, opacity: 0),
+        app: Indicator(x: 0, opacity: 0)
+    )
+}
+
 private struct WorkspacePosition {
     let group: WorkspaceGroup
     let separatorX: CGFloat?
@@ -82,7 +92,10 @@ private final class MenuBarApp: NSObject, NSApplicationDelegate, NSMenuDelegate 
     private var lastError: String?
     private var icons: [String: NSImage] = [:]
     private var displayedIndicators: IndicatorPositions?
+    private var indicatorTarget: IndicatorPositions?
+    private var indicatorVelocities = IndicatorVelocities.zero
     private var animationTimer: Timer?
+    private var lastAnimationTime: TimeInterval?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -144,41 +157,91 @@ private final class MenuBarApp: NSObject, NSApplicationDelegate, NSMenuDelegate 
 
     private func animateIndicators() {
         guard let layout = currentLayout else { return }
-        let previous = displayedIndicators
         let target = IndicatorPositions(
             workspace: Indicator(
-                x: layout.workspaceIndicatorX ?? previous?.workspace.x ?? 0,
+                x: layout.workspaceIndicatorX ?? displayedIndicators?.workspace.x ?? 0,
                 opacity: layout.workspaceIndicatorX == nil ? 0 : 1
             ),
             app: Indicator(
-                x: layout.appIndicatorX ?? previous?.app.x ?? 0,
+                x: layout.appIndicatorX ?? displayedIndicators?.app.x ?? 0,
                 opacity: layout.appIndicatorX == nil ? 0 : 1
             )
         )
-        animationTimer?.invalidate()
-        guard let previous, previous != target else {
+
+        guard displayedIndicators != nil else {
             displayedIndicators = target
+            indicatorTarget = target
             render()
             return
         }
 
-        let start = ProcessInfo.processInfo.systemUptime
-        let duration = 0.28
-        let timer = Timer(timeInterval: 1.0 / 60.0, repeats: true) { [weak self] timer in
-            guard let self else { timer.invalidate(); return }
-            let elapsed = ProcessInfo.processInfo.systemUptime - start
-            let fraction = CGFloat(min(1, elapsed / duration))
-            let eased = fraction * fraction * (3 - 2 * fraction)
-            self.displayedIndicators = previous.moved(toward: target, progress: eased)
-            self.render()
-            if fraction >= 1 {
-                timer.invalidate()
-                self.animationTimer = nil
-            }
+        // Retarget the existing spring instead of restarting a tween. This keeps
+        // both position and velocity continuous when focus events arrive quickly.
+        indicatorTarget = target
+        guard displayedIndicators != target || animationTimer != nil else {
+            render()
+            return
         }
-        animationTimer = timer
-        RunLoop.main.add(timer, forMode: .common)
+
+        if animationTimer == nil {
+            lastAnimationTime = ProcessInfo.processInfo.systemUptime
+            let timer = Timer(timeInterval: 1.0 / 60.0, repeats: true) { [weak self] timer in
+                guard let self else { timer.invalidate(); return }
+                self.stepIndicatorAnimation()
+            }
+            animationTimer = timer
+            RunLoop.main.add(timer, forMode: .common)
+        }
         render()
+    }
+
+    private func stepIndicatorAnimation() {
+        guard let target = indicatorTarget, var displayed = displayedIndicators else {
+            stopIndicatorAnimation()
+            return
+        }
+
+        let now = ProcessInfo.processInfo.systemUptime
+        let dt = CGFloat(min(1.0 / 30.0, now - (lastAnimationTime ?? now)))
+        lastAnimationTime = now
+
+        // Critically damped spring: responsive when retargeted, without the
+        // abrupt velocity changes produced by restarting an ease-in/ease-out tween.
+        let stiffness: CGFloat = 260
+        let damping: CGFloat = 30
+        func step(_ value: inout CGFloat, _ velocity: inout CGFloat, toward target: CGFloat) {
+            velocity += (target - value) * stiffness * dt
+            velocity *= CGFloat(exp(Double(-damping * dt)))
+            value += velocity * dt
+        }
+
+        step(&displayed.workspace.x, &indicatorVelocities.workspace.x, toward: target.workspace.x)
+        step(&displayed.workspace.opacity, &indicatorVelocities.workspace.opacity, toward: target.workspace.opacity)
+        step(&displayed.app.x, &indicatorVelocities.app.x, toward: target.app.x)
+        step(&displayed.app.opacity, &indicatorVelocities.app.opacity, toward: target.app.opacity)
+        displayedIndicators = displayed
+        render()
+
+        let settled = abs(displayed.workspace.x - target.workspace.x) < 0.01 &&
+            abs(displayed.workspace.opacity - target.workspace.opacity) < 0.01 &&
+            abs(displayed.app.x - target.app.x) < 0.01 &&
+            abs(displayed.app.opacity - target.app.opacity) < 0.01 &&
+            abs(indicatorVelocities.workspace.x) < 0.01 &&
+            abs(indicatorVelocities.workspace.opacity) < 0.01 &&
+            abs(indicatorVelocities.app.x) < 0.01 &&
+            abs(indicatorVelocities.app.opacity) < 0.01
+        if settled {
+            displayedIndicators = target
+            stopIndicatorAnimation()
+            render()
+        }
+    }
+
+    private func stopIndicatorAnimation() {
+        animationTimer?.invalidate()
+        animationTimer = nil
+        lastAnimationTime = nil
+        indicatorVelocities = .zero
     }
 
     private func render() {
